@@ -1,5 +1,3 @@
-setwd("weather")
-
 library(ggthemes)
 library(scales)
 library(maps)
@@ -7,7 +5,13 @@ library(lubridate)
 library(tidyverse)
 ##library(urbnmapr)
 
-theme_set(theme_fivethirtyeight())
+theme_set(theme_fivethirtyeight()+
+            theme(rect = element_blank(),
+                  panel.border = element_blank(),
+                  strip.background = element_blank(),
+                  panel.grid.major = element_blank(),
+                  axis.title=element_blank()))
+
 
 colors <- c(pleasant = "#1a9641", 
             hot = "#d6604d", 
@@ -20,11 +24,11 @@ caption <- ("Sources: NOAA Global Summary of the Day, U.S. Census\n taraskaduk.c
 
 
 
-data_daily <- readRDS("data/6-data-daily.RDS")
-pleasant_daily <- readRDS("data/6-pleasant-daily.RDS")
-summary_avg <- readRDS("data/6-summary-avg.RDS")
-summary_coords <- readRDS("data/6-summary-coords.RDS")
-summary_locations <- readRDS("data/6-summary-locations.RDS")
+data_daily <- readRDS("rds/6-data-daily.RDS")
+pleasant_daily <- readRDS("rds/6-pleasant-daily.RDS")
+summary_avg <- readRDS("rds/6-summary-avg.RDS")
+summary_coords <- readRDS("rds/6-summary-coords.RDS")
+summary_locations <- readRDS("rds/6-summary-locations.RDS")
 
 
 
@@ -36,8 +40,8 @@ summary_locations <- readRDS("data/6-summary-locations.RDS")
 
 # Pixel map  -------------------------------------------------------------------
 
-lat <- data_frame(lat05 = seq(-90, 90, by = .5))
-lon <- data_frame(lon05 = seq(-180, 180, by = .5))
+lat <- tibble(lat05 = seq(-90, 90, by = .5))
+lon <- tibble(lon05 = seq(-180, 180, by = .5))
 dots <- lat %>% 
   merge(lon, all = TRUE)
 
@@ -71,34 +75,22 @@ plot_map <- ggplot() +
        caption = caption)
 
 plot_map
+ggsave("map.png", width = 12, height = 8, units = "in")
 
-
-
-
-# Another map??? ----------------------------------------------------------
-
-# counties <- urbnmapr::counties
-#   
-# cbsa_to_fips <- read_csv("data/0-raw/cbsa2fipsxw.csv") %>% 
-#   filter(!is.na(cbsacode)) %>% 
-#   select(cbsacode, fipsstatecode, fipscountycode) %>% 
-#   mutate_all(as.character) %>% 
-#   mutate(fipscountycode = str_pad(fipscountycode, 3, side = "left", pad = "0"),
-#          fipsstatecode = str_pad(fipsstatecode, 2, side = "left", pad = "0"),
-#          county_fips = paste0(fipsstatecode, fipscountycode))
-# 
-# 
-# ## Something is wrong here...
-# pleasant_counties <- pleasant_daily %>% 
-#   head(1000) %>% 
-#   left_join(cbsa_to_fips, by = c('cbsafp' = 'cbsacode')) %>% 
-#   left_join(counties, by = c('county_fips'))
 
 
 # Ranks -------------------------------------------------------------------
 
 
-f_baseplot <- function(df = summary_locations, df2 = pleasant_daily, pop = 0, metro = "all", n = 20, dir = "most", year = 2017, ncol = 4) {
+f_baseplot <- function(df = summary_locations, 
+                       df2 = pleasant_daily, 
+                       pop = 0, 
+                       metro = "all", 
+                       n = 20, 
+                       dir = "most", 
+                       year = 2017, 
+                       ncol = 4) 
+{
   
   data <- df %>% 
     filter(pop17 > pop & (metro == "all" | lsad == metro)) %>% 
@@ -106,7 +98,7 @@ f_baseplot <- function(df = summary_locations, df2 = pleasant_daily, pop = 0, me
   
   if(dir == "most") {
     data <- head(data, n)
-  } else data <- tail(data, n)
+  } else data <- data %>% mutate(name_wrapped = fct_rev(name_wrapped)) %>% tail(n)
   
   if(metro == "M1") {
     word_metro <- "metropolitan"
@@ -123,40 +115,60 @@ f_baseplot <- function(df = summary_locations, df2 = pleasant_daily, pop = 0, me
     facet_wrap(~name_wrapped, ncol = ncol) +
     scale_fill_manual(values = colors,
                       name = "Distinct classification",
-                      aesthetics = c("colour", "fill"))+
-    theme(panel.grid.major = element_blank(),
-          #axis.ticks=element_blank(),
-          axis.title=element_blank()) +
+                      aesthetics = c("colour", "fill")) +
 
     labs(title = paste("Top", n, word_metro, "areas with", dir, "pleasant days in a year", sep = " "),
          caption = caption)
 }
 
-
-f_baseplot(metro = "M1", n = 50, ncol = 10, dir = "fewest", pop = 500000) +
-  geom_tile(aes(x=day, y = month, fill = double_class), col = "black") +
-  scale_y_discrete(breaks = c("Jan", "Apr", "Jul", "Oct")) +
-  scale_x_continuous(breaks = c(1,15,30)) +
-  labs(subtitle = "With population over 500,000 people\nRanking based on years 2012 through 2017\nDisplaying year 2017") +
-  coord_equal()
-
-
-f_baseplot(metro = "M1", n = 20, ncol = 5, pop = 1000000) +
-  geom_tile(aes(x=yday, y=year, col = double_class, fill = double_class)) +
-  labs(subtitle = "With population over 1,000,000 people.\nYears 2012-2017") +
-  theme(axis.text.y = element_blank()) +
-  scale_x_continuous(
-    breaks = c(1, 91, 182, 275),
-    label = c("Jan", "Apr", "Jul", "Oct")
-  ) +
-  expand_limits(y = 2007) +
-  coord_polar()
-
-ggsave("polar.png")
-
+for (dir in c("most", "least")) {
+  for (metro in c("all", "M1")) {
+    for (ncol in c(5,10)) {
+      
+      n <- 50
+      w <- if_else(ncol == 5, 10, 20)
+      h <- if_else(ncol == 5, 15, 10)
+      file <- paste(n, dir, metro, ncol, "cols", ".png", sep = "_")
+      
+      f_baseplot(metro = metro, n = n, ncol = ncol, dir = dir) +
+        geom_tile(aes(x=day, y = month, fill = double_class), col = "black") +
+        scale_y_discrete(breaks = c("Jan", "Apr", "Jul", "Oct")) +
+        scale_x_continuous(breaks = c(1,15,30)) +
+        labs(subtitle = "Ranking based on years 2012 through 2017\nDisplaying year 2017") +
+        coord_equal()
+      
+      ggsave(file, width = w, height = h, units = "in")
+    }
+  }
+}
 
 
 
+for (dir in c("most", "least")) {
+    for (pop in c(500000,1000000)) {
+      
+    n <- 25
+    file <- paste(n, dir, pop/1000, "polar", ".png", sep = "_")
+    sub <- paste0("With population over ", comma(pop), " people.\nYears 2012-2017")
+    
+    f_baseplot(metro = "M1", n = 25, ncol = 7, pop = pop, dir = dir) +
+      geom_tile(aes(x=yday, y=year, col = double_class, fill = double_class)) +
+      labs(subtitle = sub) +
+      theme(axis.text.y = element_blank()) +
+      scale_x_continuous(
+        # breaks = c(1, 91, 182, 275),
+        # label = c("Jan", "Apr", "Jul", "Oct")
+        breaks = c(1, 182),
+        label = c("January", "July")
+      ) +
+      expand_limits(y = 2007) +
+      theme(strip.text = element_text(face = "bold")) +
+      coord_polar()
+    
+    ggsave(file, width = 12, height = 11, units = "in")
+      
+  }
+}
 
 
 
@@ -166,151 +178,69 @@ ggsave("polar.png")
 
 
 
-
-
-
-f_cal3 <- function(df = summary_locations, df2 = pleasant_daily, pop = 0, metro = "all", n = 20, dir = "most", ncol = 4) {
   
-  data <- df %>% 
-    filter(pop17 > pop & (metro == "all" | lsad == metro)) %>% 
-    arrange(rank)
+summary_locations %>% 
+    filter(pop17 > 1000000 & lsad == "M1") %>% 
+    arrange(rank) %>% 
+    head(25) %>% 
+  mutate(name_edited = fct_reorder(name_edited,rank),
+         name_short = fct_reorder(name_short,rank)) %>% 
+    inner_join(pleasant_daily %>% filter(year == year), by = "cbsafp") %>% 
   
-  if(dir == "most") {
-    data <- head(data, n)
-  } else data <- tail(data, n)
-  
-  
-  data2 <- df2
-  
-  data_plot <- data %>% 
-    inner_join(data2, by = "cbsafp")
-  
-  ggplot(data_plot, aes(x=yday, y=year, col = double_class, fill = double_class)) +
+
+  ggplot(aes(x=yday, y=year, col = double_class, fill = double_class)) +
     geom_tile() +
-    scale_color_manual(values = colors,
-                       name = "Distinct classification",
-                       aesthetics = c("colour", "fill")) +
-    theme(panel.grid.major = element_blank(),
-          axis.title=element_blank(),
-          axis.text.y = element_blank(),
-          axis.ticks=element_blank()
-    ) +
+    facet_grid(name_short ~ ., switch = "y") +
     scale_x_continuous(
-      breaks = c(1, 91, 182, 275),
-      label = c("Jan", "Apr", "Jul", "Oct")
+      # breaks = c(1, 91, 182, 275),
+      # label = c("Jan", "Apr", "Jul", "Oct")
+      breaks = c(1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335),
+      label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
     ) +
-    expand_limits(y = 2007) +
-    coord_polar()+
-    facet_wrap(~name, ncol = ncol) +
-    labs(title = paste("Top", n, "places with", dir, "pleasant days in a year", sep = " "),
-         caption = "A pleasant day is a day when the min temp was over 45F, the max temp was under 85F, the mean temp was between 55F and 75F, no significant rain or snow. \n
-       Average of years 2012 - 2017 of NOAA Global Summary of the Day data\n
-       taraskaduk.com | @taraskaduk")
-}
 
-f_cal3(metro = "M1", n = 15, ncol = 3)
-
-
-
-f_cal2 <- function(df = summary_locations, df2 = pleasant_daily, pop = 0, metro = "all", n = 20, dir = "top", yr = 2017, ncol = 4) {
-  
-  data <- df %>% 
-    filter(pop17 > pop & (metro == "all" | lsad == metro)) %>% 
-    arrange(rank)
-  
-  if(dir == "top") {
-    data <- head(data, n)
-  } else data <- tail(data, n)
-  
-  data2 <- df2 %>% 
-    filter(year == yr)
-  
-  data_plot <- data %>% 
-    inner_join(data2, by = "cbsafp")
-  
-  ggplot(data_plot, aes(x=date, name, fill = double_class)) +
-    geom_tile(col = "black") +
+    theme(axis.text.y = element_blank(),
+          strip.text.y = element_text(angle = 180)) +
     scale_fill_manual(values = colors,
-                      name = "Distinct classification")+
-    theme(panel.grid.major = element_blank()) +
-    #coord_equal() +
-    labs(title = paste("Top", n, "places with", dir, "pleasant days in a year", sep = " "),
-         caption = "A pleasant day is a day when the min temp was over 45F, the max temp was under 85F, the mean temp was between 55F and 75F, no significant rain or snow. \n
-       Average of years 2012 - 2017 of NOAA Global Summary of the Day data\n
-       taraskaduk.com | @taraskaduk")
-}
+                      name = "Distinct classification",
+                      aesthetics = c("colour", "fill")) +
+    
+    labs(title = "Top 25 metro areas with most pleasant days in a year",
+         subtitle = "Displaying years 2012 - 2017",
+         caption = caption)
 
-f_cal2(metro = "M1", yr = 2017, n = 200, ncol = 5)
+ggsave("new.png", width = 10, height = 8, units = "in", dpi = "retina")
 
 
 
 
+# to share
 
-
-
-
-
-
-
-
-
-
-
-f_city <- function(city, data = pleasant_daily) {
+# Your data is of a daily grain. Each day is marked with a distinct class.
+# In my case: pleasant, elements, hot, cold, hot & elements, cold & elements
+ggplot(your_data) +
+  # Main geom is geom_tile(): x is day of the year (1 through 365 or 366, use yday()), y is year.
+  geom_tile(aes(x=yday, y=year, col = distinct_class, fill = distinct_class)) +
+  # This is to make a donut hole
+  expand_limits(y = 2007) +
+  #And this makes a donut
+  coord_polar() +
+  # And this makes many donuts: one per city in my case
+  facet_wrap(~city, ncol = 5) +
+    
+  # The rest is just aesthetics.
   
-city_str <-  paste(city, collapse ="|") 
-  
-data %>% filter(str_detect(name, city_str) == TRUE) %>% 
-    mutate(month = factor(format(date, "%b"), levels = rev(month.abb))) %>% 
-    ggplot(aes(x=day, y = month, fill = double_class)) +
-    geom_tile(col = "black") +
-    facet_grid(year ~ name) +
-    scale_fill_manual(values = c(pleasant = "#1a9641", 
-                                 hot = "#d6604d", 
-                                 cold = "#4393c3", 
-                                 elements = "#bebada",
-                                 `hot & elements` = "#ca0020",
-                                 `cold & elements` = "#0571b0"), 
-                      name = "Distinct classification")+
-    theme(panel.grid.major = element_blank()) +
-    coord_equal()
-  
-}
-
-
-
-f_city(city = c("Seattle", "Los Angeles", "Jacksonville"))
-
-
-pleasant_yearly %>% 
-  filter(rank < 50) %>% 
-  ggplot(aes(x = name, y = n, fill = double_class)) +
-    geom_col() +
-    theme_fivethirtyeight() + 
-    scale_fill_manual(values = c(pleasant = "#1a9641", 
-                                 hot = "#d6604d", 
-                                 cold = "#4393c3", 
-                                 elements = "#bebada",
-                                 `hot & elements` = "#ca0020",
-                                 `cold & elements` = "#0571b0"), 
-                      name = "Distinct classification")+
-    theme(panel.grid.major = element_blank()) +
-    coord_flip()
-
-pleasant_yearly %>% 
-  filter(rank_rev < 25) %>% 
-  ggplot(aes(x = name, y = n, fill = double_class)) +
-  geom_col(
-    #width = 0.5
-    )+
-  theme_fivethirtyeight() + 
-  scale_fill_manual(values = c(pleasant = "#1a9641", 
-                               hot = "#d6604d", 
-                               cold = "#4393c3", 
-                               elements = "#bebada",
-                               `hot & elements` = "#ca0020",
-                               `cold & elements` = "#0571b0"), 
-                    name = "Distinct classification")+
-  theme(panel.grid.major = element_blank()) +
-  #geom_hline(yintercept = seq(1,364, by = 1), col = "grey94", size = 0.5)+
-  coord_flip()
+  # This one marks "January" and "July" on the donut 
+  scale_x_continuous(
+    breaks = c(1, 182),
+    label = c("January", "July")
+  ) +
+  # Your customizations go here
+  theme() +
+  # Legend cleanup
+  scale_fill_manual(values = your_colors_vector,
+                    name = "Your distinct classification",
+                    aesthetics = c("colour", "fill")) +
+  # Title and caption
+  labs(title = "Your title",
+       subtitle = "Your subtitle",
+       caption = "Your caption")
