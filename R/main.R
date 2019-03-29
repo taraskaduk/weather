@@ -1,15 +1,3 @@
-# Pseudo-code -------------------------------------------------------------
-
-# 1. Get the list of the cities
-# 2. Get coordinates
-# 3. Get closest stations
-#   3.1. Stations withing 25 miles
-#   3.2. Then look with 50 miles radius
-# 4. Get weather data for said stations
-# 5. Group by and average reading per city
-# 6. Ta-da!
-
-
 # Setup -------------------------------------------------------------------
 
 library(tidyverse)
@@ -19,24 +7,23 @@ library(weathermetrics)
 
 library(ggthemes)
 library(scales)
-library(maps)
 library(lubridate)
-
 
 years <- seq(year(today()) - 5, year(today()))
 
+# Cities -----------------------------------
 
 cities_import <- read_csv("data/worldcities.csv") %>%
   rename(lon = lng)
 
 cities <- cities_import %>%
-  filter(population >= 1000000)
+  filter(population >= 250000)
 
 
-# Stattions ----------------------------------------------------
+# Stations  ----------------------------------------------------
 
 cities_stations <- cities %>% 
-  mutate(stnid = purrr::map2(lat, lon, nearest_stations, distance = 25)) %>% 
+  mutate(stnid = purrr::map2(lat, lon, nearest_stations, distance = 30)) %>% 
   unnest()
 
 # Get unique stations
@@ -47,39 +34,44 @@ stations <- cities_stations %>%
 stations_v <- as_vector(stations)
 
 
+# Unpack weather data --------------------------------------
+
+## Unpack downloaded yearly archives 
 to_untar <- list.files("data/gsod", full.names = TRUE)
 purrr::map(to_untar, untar, exdir = tempdir())
 
-
+## Go through all unpacked files, decide what to remove and what to keep
+## based on the stations of interest
 files_all <- list.files(path = tempdir())
 files_stations <- NULL
 for (year in years) {
   files_stations <-
     c(files_stations, paste0(stations_v, "-", year, ".op.gz"))
 }
-
 files_keep <- subset(files_all, files_all %in% files_stations)
 files_remove <- subset(files_all, !(files_all %in% files_stations))
-
 file.remove(paste(tempdir(),files_remove, sep = "/"))
+
+
+# Transform weather data ----------------------------------------------------
 
 weather_import <- purrr::map_dfr(tempdir(), reformat_GSOD)
 unlink(tempdir())
 colnames(weather_import) <- tolower(colnames(weather_import))
 saveRDS(weather_import, file = "data/weather_import.rds")
 
-
 weather <- weather_import %>% 
-  # Get rid of stations on water: oceans and lakes
+  ## Get rid of stations on water: oceans and lakes
   mutate(country = map.where('world', lon, lat),
-         lakes = map.where('lakes', lon, lat)) %>% 
+         lakes = map.where('lakes', lon, lat),
+         yday = yday(date)) %>% 
   filter(!is.na(country) & is.na(lakes)) %>% 
   select(-c(lakes,  country)) %>% 
-  # Remove counts and flags - won't be used in this analysis, 
-  # although could have been useful for precip and snow at the very least.
+  ## Remove counts and flags - won't be used in this analysis, 
+  ## although could have been useful for precip and snow at the very least.
   select(-c(usaf, wban, dewp_cnt, slp_cnt, stp_cnt, visib_cnt, wdsp_cnt, max_flag, prcp_flag))
 
-
+## "Feels like" function, accounting for heat index and wind chills
 feels_like <- function(temp, rh, wind) {
   hi <-  if_else(is.na(rh), temp, heat.index(t = temp, rh = rh, temperature.metric = "celsius", output.metric = "celsius", round = 2))
   temp_f <- celsius.to.fahrenheit(temp)
@@ -93,34 +85,31 @@ feels_like <- function(temp, rh, wind) {
 }
 
 
-# Data summarized ---------------------------------------------------------
+# Join city and weather data ---------
 
 data <- cities_stations %>% 
   inner_join(weather, by = "stnid") %>% 
-  select(city, country, lat = lat.x, lon = lon.y, capital, date = yearmoda, year, month, day,
+  select(city, country, lat = lat.x, lon = lon.x, capital, population, date = yearmoda, year, month, day, yday,
          temp_max = max, temp_min = min, temp_mean = temp, dewp, slp, stp, visib, wdsp, mxspd, gust, prcp, sndp, i_fog:rh) %>% 
-  group_by(city, country, lat, lon, capital, date, year, month, day) %>% 
+  group_by(city, country, lat, lon, capital, population, date, year, month, day, yday) %>% 
   summarise_all(mean, na.rm = TRUE) %>% 
   ungroup() %>% 
   # Clean up NaN
-  mutate_all(~if_else(is.nan(.x) | is.infinite(.x), NA_character_, as.character(.x))) %>% 
-  mutate_at(vars(lat, lon, capital, temp_max:rh), as.numeric) %>% 
-  mutate(date = as.Date(date),
-         #Override or create new? Override for now
-         temp_mean = feels_like(temp_mean, rh, wdsp),
+  mutate_at(vars(temp_max:rh), ~if_else(is.nan(.x) | is.infinite(.x), NA_real_, .x)) %>% 
+  mutate_at(vars(year:day), as.numeric) %>% 
+  #Override or create new? Override for now
+  mutate(temp_mean = feels_like(temp_mean, rh, wdsp),
          temp_min = feels_like(temp_min, rh, wdsp),
          temp_max = feels_like(temp_max, rh, wdsp)) %>%
-  
   # A few possible substitutions
   replace_na(list(sndp = 0, prcp = 0)) %>% 
-  mutate(yday = yday(date),
-         temp_max = if_else(is.na(temp_max) & is.na(temp_min), temp_mean,
+  mutate(temp_max = if_else(is.na(temp_max) & is.na(temp_min), temp_mean,
                             if_else(is.na(temp_max), 2*temp_mean - temp_min, temp_max)),
          temp_min = if_else(is.na(temp_max) & is.na(temp_min), temp_mean, 
                             if_else(is.na(temp_min), 2*temp_mean - temp_max, temp_min)))
 
 
-# Pleasant ----------------------------------------------------------------
+# Pleasant days --------------------------------
 
 # Parameters
 params <- list(
@@ -135,60 +124,52 @@ params <- list(
 
 
 data_daily <- data %>% 
-  mutate(pls_temp = case_when(is.na(temp_max) | is.na(temp_mean) | is.na(temp_min) ~ "unknown",
-                              temp_min > params$temp_min[2] ~ 'hot',
-                              temp_min <  params$temp_min[1] ~ 'cold',
-                              temp_max >  params$temp_max[2] ~ 'hot',
-                              temp_max <  params$temp_max[1] ~ 'cold',
-                              temp_mean > params$temp_mean[2] ~ 'hot',
-                              temp_mean < params$temp_mean[1] ~ 'cold',
-                              TRUE ~ "pleasant"),
-         ## keep tweaking this one... What's the "pleasant" amount of elements???
-         pls_elements = case_when(is.na(i_rain_drizzle) & is.na(i_snow_ice) ~ "unknown",
-                                  prcp <= params$prcp &
-                                    sndp <= params$sndp &
-                                    i_rain_drizzle <= 0.5 &
-                                    i_snow_ice <= 0.5
-                                  ~ "pleasant",
-                                  TRUE ~ "elements"),
+  mutate(hot = if_else(temp_min > params$temp_min[2] |
+                       temp_max >  params$temp_max[2] |
+                       temp_mean > params$temp_mean[2], 1, 0),
+         cold = if_else(temp_min <  params$temp_min[1] |
+                        temp_max <  params$temp_max[1]  |
+                        temp_mean < params$temp_mean[1], 1, 0),
          
-         pleasant = case_when(pls_temp == 'unknown' & pls_elements == "unknown" ~ NA_real_,
-                              pls_temp == 'pleasant' & pls_elements == "pleasant" ~1,
-                              TRUE ~ 0),
-         distinct_class = case_when(is.na(pleasant) ~ "unknown",
-                                    pleasant == 1 ~ "pleasant",
-                                    pls_temp == "hot" ~ "hot",
-                                    pls_elements == "elements" ~ "elements",
-                                    pls_temp == "cold" ~ "cold",
-                                    TRUE          ~ NA_character_),
-         double_class =   case_when(is.na(pleasant) ~ "unknown",
-                                    pleasant == 1 ~ "pleasant",
-                                    pls_temp == "hot" & pls_elements != "elements"  ~ "hot",
-                                    pls_temp == "hot" & pls_elements == "elements"  ~ "hot & elements",
-                                    pls_temp == "cold" & pls_elements != "elements"  ~ "cold",
-                                    pls_temp == "cold" & pls_elements == "elements"  ~ "cold & elements",
-                                    pls_elements == "elements"    ~ "elements",
-                                    TRUE          ~ NA_character_),
+         elements = if_else(prcp > params$prcp |
+                            sndp > params$sndp |
+                            i_rain_drizzle > 0.5 |
+                            i_snow_ice > 0.5, 1, 0),
+         pleasant = if_else(hot + cold + elements == 0, 1, 0),
+         distinct_class = case_when(pleasant == 1 ~ "pleasant",
+                                    hot == 1 ~ "hot",
+                                    elements == 1 ~ "elements",
+                                    cold == 1 ~ "cold", 
+                                    TRUE  ~ NA_character_),
+         double_class =   case_when(pleasant == 1 ~ "pleasant",
+                                    hot == 1 & elements == 1 ~ "hot & elements",
+                                    cold == 1 & elements == 1 ~ "cold & elements",
+                                    hot == 1 ~ "hot",
+                                    elements == 1 ~ "elements",
+                                    cold == 1 ~ "cold", 
+                                    TRUE ~ NA_character_),
          double_class = factor(double_class, levels = c("pleasant", "elements", "cold", "cold & elements", "hot", "hot & elements"))
   )
 
 saveRDS(data_daily, file = "data/data_daily.rds")
-data_daily %>% 
-  filter(year >= 2018) %>% 
-  write_csv("data/data_daily_sample.csv")
 
 
 summary_locations <- data_daily %>%
-  group_by(city, country, lat, lon, capital, year) %>% 
-  summarise(pleasant = sum(pleasant)) %>% 
+  filter(year < year(today())) %>% 
+  group_by(city, country, lat, lon, capital, population, year) %>% 
+  summarise_at(vars(pleasant, hot, cold, elements), sum) %>% 
   ungroup() %>% 
-  group_by(city, country, lat, lon, capital) %>% 
-  summarise(pleasant_days = mean(pleasant)) %>% 
+  ## This if_else accounts for cases of leap year with all known days.
+  ## It makes sure we don't have negative unknown days
+  ## But also levels out leap year for the next step of averaging
+  mutate(unknown = if_else(pleasant + hot + cold >= 365, 0, 365 - pleasant - hot - cold)) %>% 
+  filter(unknown < 365 * 0.1) %>% 
+  group_by(city, country, lat, lon, capital, population) %>% 
+  summarise_at(vars(pleasant, hot, cold, elements, unknown), ~round(mean(.),0)) %>% 
   ungroup() %>% 
-  filter(!is.na(pleasant_days)) %>% 
-  mutate(rank = row_number(desc(pleasant_days)),
-         rank_rev = row_number(pleasant_days),
-         points = pleasant_days / 365 * 100,
+  mutate(rank = row_number(desc(pleasant)),
+         rank_rev = row_number(pleasant),
+         points = pleasant / 365 * 100,
          name = reorder(city, rank))
 
 
@@ -222,14 +203,102 @@ caption <- ("Sources: NOAA Global Summary of the Day, U.S. Census\n taraskaduk.c
 
 
 
-ggplot(data_daily) +
+
+
+
+
+
+
+
+f_baseplot <- function(df = summary_locations, 
+                       df2 = data_daily, 
+                       pop = 0, 
+                       n = 20, 
+                       dir = "most", 
+                       year = 2018, 
+                       ncol = 4) 
+{
+  
+  data <- df %>% 
+    filter(population > pop) %>% 
+    arrange(rank)
+  
+  if(dir == "most") { 
+    data <- head(data, n) %>% 
+      mutate(rank = row_number(desc(pleasant)),
+             label = paste0(rank, ". ", city, ", \n", country),
+             label = reorder(label, rank))
+    } 
+  else { 
+    data <- data %>% 
+      mutate(city = fct_rev(city)) %>% 
+      tail(n) %>% 
+      mutate(rank = row_number(pleasant),
+             label = paste0(rank, ". ", city, ", \n", country),
+             label = reorder(label, rank))
+    }
+  
+  data <- data %>% 
+    inner_join(df2, by = c("city", "lat", "lon"))
+  
+  ggplot(data) +
+    facet_wrap(~label, ncol = ncol) +
+    scale_fill_manual(values = colors,
+                      name = "Distinct classification",
+                      aesthetics = c("colour", "fill")) +
+    
+    labs(title = paste("Top", n, "cities with", dir, "pleasant days in a year", sep = " "),
+         caption = caption)
+}
+
+
+
+
+
+for (dir in c("most", "least")) {
+  for (pop in c(1000000,500000)) {
+    
+    n <- 25
+    file <- paste(n, dir, pop/1000, "polar", ".png", sep = "_")
+    sub <- paste0("With population over ", comma(pop), " people.\nYears 2014-2019",
+    "\nRanked based on years with over 90% of daily data available.",
+    "\nVisualizing all data, including incomplete years")
+    
+    f_baseplot(n = 25, ncol = 7, pop = pop, dir = dir) +
+      geom_tile(aes(x=yday, y=year, col = double_class, fill = double_class)) +
+      labs(subtitle = sub) +
+      theme(axis.text.y = element_blank()) +
+      scale_x_continuous(
+        # breaks = c(1, 91, 182, 275),
+        # label = c("Jan", "Apr", "Jul", "Oct")
+        breaks = c(1, 182),
+        label = c("January", "July")
+      ) +
+      expand_limits(y = 2009) +
+      theme(strip.text = element_text(face = "bold")) +
+      coord_polar()
+    
+    ggsave(file, width = 12, height = 11, units = "in")
+    
+  }
+}
+
+
+
+
+
+
+
+data_daily %>% 
+  left_join(summary_locations %>% select(city, lat, lon, rank), by = c("city", "lat", "lon")) %>% 
+  filter(rank <= 25) %>% 
+ggplot() +
   geom_tile(aes(x=yday, y=year, col = double_class, fill = double_class)) +
-  facet_wrap(~name, ncol = 5) +
+  facet_wrap(~city, ncol = 5) +
   scale_x_continuous(
     breaks = c(1, 182),
     label = c("January", "July")
   ) +
-  theme() +
   scale_fill_manual(values = colors,
                     name = "Your distinct classification",
                     aesthetics = c("colour", "fill")) +
