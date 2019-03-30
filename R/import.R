@@ -1,4 +1,5 @@
 library(tidyverse)
+library(lubridate)
 
 # Stations ----------------------------------------------------------------
 curl::curl_download('ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.txt', destfile = "data/isd-history.txt")
@@ -13,6 +14,12 @@ for (year in years) {
   destfile <- paste0('data/gsod/',file,'.op.gz')
   curl::curl_download(ftp, destfile)
 }
+
+## Current year only
+file <- paste0('gsod_',year(today()))
+ftp <- paste0('ftp://ftp.ncdc.noaa.gov/pub/data/gsod/',year(today()),'/',file,'.tar')
+destfile <- paste0('data/gsod/',file,'.op.gz')
+curl::curl_download(ftp, destfile)
 
 # Cities ------------------------------------------------------------
 

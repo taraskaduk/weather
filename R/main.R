@@ -64,7 +64,7 @@ weather <- weather_import %>%
   ## Get rid of stations on water: oceans and lakes
   mutate(country = map.where('world', lon, lat),
          lakes = map.where('lakes', lon, lat),
-         yday = yday(date)) %>% 
+         yday = yday(yearmoda)) %>% 
   filter(!is.na(country) & is.na(lakes)) %>% 
   select(-c(lakes,  country)) %>% 
   ## Remove counts and flags - won't be used in this analysis, 
@@ -75,10 +75,9 @@ weather <- weather_import %>%
 feels_like <- function(temp, rh, wind) {
   hi <-  if_else(is.na(rh), temp, heat.index(t = temp, rh = rh, temperature.metric = "celsius", output.metric = "celsius", round = 2))
   temp_f <- celsius.to.fahrenheit(temp)
-  wind_mph <- wind * 1.1507794
-  wc_f = (35.74 + 0.6215*temp_f) - 35.75*(wind_mph^0.16) + 0.4275 * temp_f * (wind_mph^0.16)
+  wc_f = (35.74 + 0.6215*temp_f) - 35.75*(wind^0.16) + 0.4275 * temp_f * (wind^0.16)
   wc <- if_else(is.na(wind), temp, fahrenheit.to.celsius(wc_f))
-  new_temp <- case_when(temp < 10 & wind_mph > 3 ~ wc,
+  new_temp <- case_when(temp < 10 & wind > 3 ~ wc,
                         temp > 27 ~ hi,
                         TRUE ~ temp)
   return(new_temp)
@@ -278,7 +277,7 @@ for (dir in c("most", "least")) {
       theme(strip.text = element_text(face = "bold")) +
       coord_polar()
     
-    ggsave(file, width = 12, height = 11, units = "in")
+    ggsave(paste0("charts/",file), width = 12, height = 11, units = "in")
     
   }
 }
