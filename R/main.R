@@ -132,22 +132,25 @@ data_daily <- data %>%
          
          elements = if_else(prcp > params$prcp |
                             sndp > params$sndp |
-                            i_rain_drizzle > 0.5 |
-                            i_snow_ice > 0.5, 1, 0),
-         pleasant = if_else(hot + cold + elements == 0, 1, 0),
+                            i_rain_drizzle > 0.66 |
+                            i_snow_ice > 0.66, 1, 0),
+         wind = if_else(wdsp > 10, 1, 0),
+         pleasant = if_else(hot + cold + elements + wind == 0, 1, 0),
          distinct_class = case_when(pleasant == 1 ~ "pleasant",
                                     hot == 1 ~ "hot",
-                                    elements == 1 ~ "elements",
                                     cold == 1 ~ "cold", 
+                                    elements == 1 ~ "elements",
+                                    wind == 1 ~ "wind",
                                     TRUE  ~ NA_character_),
          double_class =   case_when(pleasant == 1 ~ "pleasant",
                                     hot == 1 & elements == 1 ~ "hot & elements",
                                     cold == 1 & elements == 1 ~ "cold & elements",
                                     hot == 1 ~ "hot",
-                                    elements == 1 ~ "elements",
                                     cold == 1 ~ "cold", 
+                                    elements == 1 ~ "elements",
+                                    wind == 1 ~ "wind",
                                     TRUE ~ NA_character_),
-         double_class = factor(double_class, levels = c("pleasant", "elements", "cold", "cold & elements", "hot", "hot & elements"))
+         double_class = factor(double_class, levels = c("pleasant", "elements", "wind", "cold", "cold & elements", "hot", "hot & elements"))
   )
 
 saveRDS(data_daily, file = "data/data_daily.rds")
@@ -156,15 +159,15 @@ saveRDS(data_daily, file = "data/data_daily.rds")
 summary_locations <- data_daily %>%
   filter(year < year(today())) %>% 
   group_by(city, country, lat, lon, capital, population, year) %>% 
-  summarise_at(vars(pleasant, hot, cold, elements), sum) %>% 
+  summarise_at(vars(pleasant, hot, cold, elements, wind), sum) %>% 
   ungroup() %>% 
   ## This if_else accounts for cases of leap year with all known days.
   ## It makes sure we don't have negative unknown days
   ## But also levels out leap year for the next step of averaging
-  mutate(unknown = if_else(pleasant + hot + cold >= 365, 0, 365 - pleasant - hot - cold)) %>% 
+  mutate(unknown = if_else(pleasant + hot + cold + wind >= 365, 0, 365 - pleasant - hot - cold - wind)) %>% 
   filter(unknown < 365 * 0.1) %>% 
   group_by(city, country, lat, lon, capital, population) %>% 
-  summarise_at(vars(pleasant, hot, cold, elements, unknown), ~round(mean(.),0)) %>% 
+  summarise_at(vars(pleasant, hot, cold, elements, wind, unknown), ~round(mean(.),0)) %>% 
   ungroup() %>% 
   mutate(rank = row_number(desc(pleasant)),
          rank_rev = row_number(pleasant),
