@@ -107,6 +107,7 @@ data <- cities_stations %>%
          temp_min = if_else(is.na(temp_max) & is.na(temp_min), temp_mean, 
                             if_else(is.na(temp_min), 2*temp_mean - temp_max, temp_min)))
 
+data %>% as.data.frame() %>% save(file = "data/data.RData")
 
 # Pleasant days --------------------------------
 
