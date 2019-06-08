@@ -59,6 +59,8 @@ weather_import <- purrr::map_dfr(tempdir(), reformat_GSOD)
 unlink(tempdir())
 colnames(weather_import) <- tolower(colnames(weather_import))
 saveRDS(weather_import, file = "data/weather_import.rds")
+weather_import <- readRDS("data/weather_import.rds")
+
 
 weather <- weather_import %>% 
   ## Get rid of stations on water: oceans and lakes
@@ -108,17 +110,90 @@ data <- cities_stations %>%
                             if_else(is.na(temp_min), 2*temp_mean - temp_max, temp_min)))
 
 data %>% as.data.frame() %>% save(file = "data/data.RData")
+load("data/data.RData")
+
 
 # Pleasant days --------------------------------
 
+
+# AUC of cosine function --------------------------------------------------
+
+temp_auc <- function(temp_min, temp_max, temp_perfect = 18) {
+  a <- (temp_max - temp_min) / 2 #amplitude
+  period <- 24
+  b <- 2 * pi / period
+  d <- temp_min + a
+  temperature <- function(x) {
+    -a * cos(b * x) + d
+  }
+  if (temp_min >= temp_perfect) {
+    # integral <- -a*sin(24*b) + 24*d - 24*temp_perfect
+    integral <- integrate(temperature, 0, 24)$value - temp_perfect * 24
+    area <- integral
+  } else if (temp_max <= temp_perfect) {
+    integral <- temp_perfect * 24 - integrate(temperature, 0, 24)$value
+    area <- integral
+  } else {
+    intercept1 <- acos((d - temp_perfect) / a) / b
+    intercept2 <- (12 - intercept1) * 2 + intercept1
+    
+    integral1 <-
+      temp_perfect * intercept1 - integrate(temperature, 0, intercept1)$value
+    integral2 <-
+      integrate(temperature, intercept1, intercept2)$value - temp_perfect * (intercept2 -
+                                                                               intercept1)
+    integral3 <-
+      temp_perfect * (24 - intercept2) - integrate(temperature, intercept2, 24)$value
+    
+    area <- integral1 + integral2 + integral3
+  }
+  return(area)
+}
+
+
+
+## effects of the auc approach
+
+df <- tibble(min=seq(0L,10L, by = 1), max=seq(20L, 25L, by = 0.5))
+df <- df %>% mutate(auc = map2(min, max, temp_auc),
+                    auc = round(as.numeric(auc)))
+ggplot(df, aes(x=min, y=max, size = auc)) + geom_point()
+
+
+
+ggplot(data.frame( x = c(0,24)), aes( x = x)) + 
+  stat_function(fun = function(x) cos(x), 
+                geom = "line", n=5000, col='blue')
+
+
+
+# https://www.reddit.com/r/askscience/comments/ulxdg/what_is_the_ideal_temperature_of_surroundings_for/
+# http://www.healthyheating.com/solutions.htm#.XMnNYJO6Mne
+# https://www.scientificamerican.com/article/why-people-feel-hot/
+# https://www.outsideonline.com/1784591/whats-best-temperature-productivity
+# http://www.city-data.com/forum/general-u-s/54730-what-your-ideal-outdoor-temperature-4.html
+# https://www.huffingtonpost.com.au/2017/11/27/this-is-the-perfect-temperature-for-being-happy-and-social-study-finds_a_23288718/
+# https://www.coynecollege.edu/news/ideal-temperatures-heat-cool/
+# https://www.sleep.org/articles/temperature-for-sleep/
+# https://health.clevelandclinic.org/what-is-the-ideal-sleeping-temperature-for-my-bedroom/
+
+
+# ----------------------
+
 # Parameters
+
+## http://www.localweather.net.nz/smf/general-discussion/1/what-is-the-definition-of-a-rain-day-or-a-wet-day/1873/msg11217#msg11217
+
+
+
 params <- list(
-  temp_max = c(16, 32), #65 - "if it didn't get up to 65F in the warmest hour..."
-  temp_min = c(4, 21), #lowest would be night + sunrise temp. Let's rule out near freezing temps.
+  temp_max = c(20, 35), #65 - "if it didn't get up to 65F in the warmest hour..."
+  temp_min = c(5, 15), #lowest would be night + sunrise temp. Let's rule out near freezing temps.
   #the upper limit is "when even the lowest night temp is too hot..."
   temp_mean = c(13, 24),
-  prcp = 2.5,
-  sndp = 1.7
+  
+  prcp = 10,
+  sndp = 10
 )
 
 
@@ -130,7 +205,7 @@ data_daily <- data %>%
          cold = if_else(temp_min <  params$temp_min[1] |
                         temp_max <  params$temp_max[1]  |
                         temp_mean < params$temp_mean[1], 1, 0),
-         
+         auc = map2_dbl(temp_min, temp_max, temp_auc),
          elements = if_else(prcp > params$prcp |
                             sndp > params$sndp |
                             i_rain_drizzle > 0.66 |
@@ -155,6 +230,36 @@ data_daily <- data %>%
   )
 
 saveRDS(data_daily, file = "data/data_daily.rds")
+data_daily <- readRDS("data/data_daily.rds")
+
+summary_locations_auc <- data_daily %>%
+  filter(year < year(today())) %>% 
+  group_by(city, country, lat, lon, capital, population, year) %>% 
+  summarise(auc = mean(auc),
+            days = n()) %>% 
+  ungroup() %>% 
+  ## This if_else accounts for cases of leap year with all known days.
+  ## It makes sure we don't have negative unknown days
+  ## But also levels out leap year for the next step of averaging
+  mutate(unknown = if_else(days >= 365, 0, 365 - days)) %>% 
+  filter(unknown < 365 * 0.1) %>% 
+  #filter(country == "United States") %>% 
+  filter(population >= 1000000) %>% 
+  group_by(city, country, lat, lon, capital, population) %>% 
+  summarise(auc = mean(auc)) %>% 
+  ungroup() %>% 
+  mutate(rank = row_number(auc),
+         rank_rev = row_number(desc(auc)),
+         points = auc / max(auc) * 100,
+         name = reorder(city, rank))
+
+
+ggplot(summary_locations_auc, aes(x=lon, y=lat, col = rank)) + geom_point()
+
+
+
+
+
 
 
 summary_locations <- data_daily %>%
