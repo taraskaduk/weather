@@ -1,0 +1,169 @@
+---
+title: "Untitled"
+author: "taras kaduk"
+date: "1/28/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(readr)
+library(rvest)
+library(tools)
+library(stringr)
+library(opencage)
+library(ggmap)
+```
+
+...
+So, finding the data is awesome and all, until you realize the magnitude. NOAA provide access to the daily weather data for the entire planet, with some records going as far back as 100 years ago. Downloading one year of data dropped a 400 Mb of records on my laptop. If we want to do a multi-year analysis, we have to be cleverer.
+
+The data on NOAA ftp is organized first by year (folder), and then by weather station. 
+But what we also have is a list of stations, and for each station we have some extra data: state, country, latitude and longitude. The state and country data isn't too helpful: aside from some details I don't like about it, it is missing a more granular level of ZIP code or at least city level.
+
+I'm now hoping to fix it with reverse geocoding: https://twitter.com/ma_salmon/status/955825905343127552
+
+If I can get each station's city and ZIP, I then can create a function to pull only the data that I need. Alons y!
+
+
+OK, so after `install.packages("opencage")` I need to register at https://geocoder.opencagedata.com/pricing 
+Aight! Got my API key!
+
+```{r eval = FALSE}
+api_key_opencage <- '2c40d268e5b0427ba678df1b5900af0a'
+```
+
+Saving it as an environment variable.
+Here are the link that got me there:
+https://cran.r-project.org/web/packages/opencage/vignettes/opencage.html
+http://happygitwithr.com/api-tokens.html
+
+
+```{r eval = FALSE}
+cat("OPENCAGE_KEY=c42f9452006747fdaf5c96099d2b73b8\n",
+    file=file.path(normalizePath("~/"), ".Renviron"),
+    append=TRUE)
+Sys.getenv("OPENCAGE_KEY")
+
+# Now testing it:
+test <- opencage_reverse(latitude = 30.3016961, 
+                 longitude = -81.6528217)
+test$results
+
+```
+
+It works! But Oh Dear Lord! TMI! TMI! Looks like more work to be done here!
+
+Now, I'm going to obtain the list of stations.
+```{r eval = FALSE}
+stations <- read_table("ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.txt", 
+                       skip = 20,
+                       na = c('999999', '99999', '-999.0', ''))
+
+colnames(stations) <- tolower(colnames(stations))
+
+stations <- stations %>% 
+  select(usaf, lat, lon) %>% 
+  filter(!is.na(lat) & !is.na(lon)) %>% 
+  distinct() %>% 
+  group_by(usaf) %>% 
+  summarise(lat = mean(lat),
+            lon = mean(lon))
+
+write_csv(stations, 'stations_initial.csv')
+
+```
+
+```{r}
+stations <- read_csv('stations_initial.csv')
+```
+
+
+
+Lovely, we have 25,000 stations, and I can make only 2,500 calls a day on `opencage` free tier. 10 days it is. But before I do that, I need to finese my approach on a couple of stations and get the output I need.
+
+```{r message=FALSE, warning=FALSE, eval = FALSE}
+test_stations <- stations %>% 
+  filter(lat > 30 & lat < 31 & lon > -82 & lon < -81)
+
+
+test_results <- purrr::map2(test_stations$lat, test_stations$lon, opencage_reverse) %>% 
+  purrr::map_df("results")
+
+test_stations_final <- test_stations %>% 
+  bind_cols(test_results) %>% 
+  select(-c(annotations.OSM.edit_url:annotations.timezone.offset_string,
+            bounds.northeast.lat:bounds.southwest.lng,
+            components._type,
+            components.road,
+            components.unknown:query,
+            components.house_number:components.aerodrome))
+
+```
+
+Wow, it worked! (see failure annotation)^[2018-01-28 OK, you people, listen up. For you, it is just the next paragraph, and you're reading this without any delay whatsoever. In reality, there is a whole Sunday afternoon, evening and night between me attempting to test the reverse geocoding and getting some results. I started off with pushing the output of `opencage_reverse` function into the existing dataframe via `mutate`. The output was, obviously, a 1-row dataframe inside of a list inside of a column. OK, we can deal with it, I thought. I can extract needed columns one by one. Which kind of worked, only that somehow I needed to call list levels and not list values, which made me call 2 more `map` functions with a `%>%` for every column. So it worked for country, then for ZIP code, and then it failed on the city, as some stations aren't in the city (and I got lucky with the former 2 columns). I had this nasty `purrr` error and no amount of googling could solve it. I tried `safely()`, `possibly()`, `pluck()`, `if_else()`, `isnull()`, `is_null()`, `modify_depth()`, tried all `map` variations including `_at` and `_if`, but nothing worked.
+I even try ditching the `opencage` package and tried `ggmap` instead (of course, same problem).
+I went back to the very beginning and decided to try something I had rejected initially: get reverse geocoding output in a separate data frame, and then column bind the result with the initial list (I come into data science with some psychological Excel traumas then haunt me to this day, and stepping out of a data frame scares the living hell out of me: "What is someone re-sorts one part of a table before I bind the two parts back into one?"). And it worked. Obviously. Better luck next time!
+
+Update 2018-02-07 So my bind_cols approach failed. I thought `opencage_reverse` returns the exact same amount of rows I supplied to it via purrr, but on the first run with 2000 stations, it only returned 1995. So I am 5 short, with no idea which ones are missing. So I have to replace `bind_cols` with some sort of a join]
+
+Now I'm going to take 10 days to gather the geolocation data on 25,000 stations, at a rate of 2,500 calls a day, and will report back in 10 days.
+
+```{r message=FALSE, warning=FALSE}
+# stations_todo <- stations
+# Repeat starting here
+
+stations_final <- read_csv("stations_final.csv")
+stations_final$usaf <- as.character(stations_final$usaf)
+stations_todo <- stations %>% 
+  anti_join(stations_final, by = 'usaf')
+
+stations_subset <- stations_todo[1:2500,]
+
+results <- purrr::map2(stations_subset$lat, stations_subset$lon, opencage_reverse) %>% 
+  purrr::map_df("results") %>%
+  select(query, 
+         timezone_offset = annotations.timezone.offset_sec, 
+         timezone = annotations.timezone.short_name, 
+         country_iso = `components.ISO_3166-1_alpha-2`, 
+         country = components.country, 
+         country_code = components.country_code, 
+         state = components.state, 
+         postcode = components.postcode, 
+         city = components.city)
+  
+
+# Old code. bind_cols won't work because opencage_reverse doesn't return the same amount of rows
+# stations_results <- stations_todo %>% head(6) %>% 
+#   unite_(col = 'query', c('lat', 'lon'), sep = ',', remove = FALSE) %>% 
+#   bind_cols(results) %>% 
+#   select(-c(annotations.OSM.edit_url:annotations.timezone.offset_string,
+#             bounds.northeast.lat:bounds.southwest.lng,
+#             components._type,
+#             components.road,
+#             components.unknown:query,
+#             components.house_number:components.aerodrome))
+
+
+
+stations_results <- stations_subset %>% 
+  unite_(col = 'query', c('lat', 'lon'), sep = ',', remove = FALSE) %>% 
+  left_join(results, by = 'query') %>% 
+  mutate(timezone_offset = as.integer(timezone_offset))
+
+# stations_final <- stations_results
+
+stations_final <- stations_final %>% union(stations_results)
+stations_todo <- stations_todo %>% 
+  anti_join(stations_final, by = 'usaf')
+
+stations_final <- stations_final %>% distinct()
+
+write_csv(stations_final, 'stations_final.csv')
+
+```
+
+
+10 days later.

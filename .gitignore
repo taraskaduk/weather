@@ -9,8 +9,9 @@
 *-Ex.R
 
 # Output files from R CMD build
-/*.tar.gz
 *.op.gz
+*.tar.gz
+data.csv
 
 # Output files from R CMD check
 /*.Rcheck/
