@@ -1,74 +1,32 @@
-# get_weather_old <- function(yrs = year(today()),
-#                         #yrs = seq(year(today()) - 5, year(today())), 
-#                         stns = stations_v) {
-#   for (yr in yrs) {
-#     file <- paste0('gsod_', yr)
-#     destfile <- paste0('data/gsod/', file, '.tar')
-#     if(file.exists(destfile) #& yr != year(today())
-#     ) next
-#     ftp <-
-#       paste0('ftp://ftp.ncdc.noaa.gov/pub/data/gsod/',
-#              yr,
-#              '/',
-#              file,
-#              '.tar')
-#     curl::curl_download(ftp, destfile)
-#   }
-#   
-#   # Unpack weather data --------------------------------------
-#   ## Unpack downloaded yearly archives 
-#   to_untar <- list.files("data/gsod", full.names = TRUE)
-#   purrr::map(to_untar, untar, exdir = tempdir())
-#   
-#   ## Go through all unpacked files, decide what to remove and what to keep
-#   ## based on the stations of interest
-#   files_all <- list.files(path = tempdir(), pattern = "([0-9]+)-([0-9]+)-([0-9]+).op.gz")
-#   files_stations <- purrr::cross(list(x1 = paste0(stns, "-"), x2 = paste0(yrs, ".op.gz"))) %>%
-#     purrr::map(purrr::lift(paste0)) %>% 
-#     as_vector()
-#   
-#   files_keep <- subset(files_all, files_all %in% files_stations)
-#   files_remove <- subset(files_all, !(files_all %in% files_stations))
-#   file.remove(paste(tempdir(),files_remove, sep = "/"))
-#   
-#   # Transform weather data ----------------------------------------------------
-#   out <- GSODR::reformat_GSOD(dsn = tempdir())
-#   unlink(tempdir(), force = TRUE, recursive = TRUE)
-#   out
-# }
-
-
-
-
 get_weather <- function(yrs = seq(year(today()) - 11, year(today())),
-                        #yrs = seq(year(today()) - 5, year(today())), 
                         stns = stations_v) {
   for (yr in yrs) {
     file <- paste0(yr, '.tar.gz')
     destfile <- paste0('data/gsod/', file)
     if (!file.exists(destfile)) {
-      link <- paste0('https://www.ncei.noaa.gov/data/global-summary-of-the-day/archive/',file)
+      link <- paste0('https://www.ncei.noaa.gov/data/global-summary-of-the-day/archive/', file)
       curl::curl_download(link, destfile)
     }
     untar(destfile, exdir = paste(tempdir(), yr, sep = "/"))
-    # file.rename(from = list.files(tempdir(), full.names = TRUE, pattern = "([0-9])+.csv"),
-    #              to = paste0(tempdir(), "/", yr, "-", list.files(tempdir(), pattern = "([0-9])+.csv")))
   }
   
-  ## Go through all unpacked files, decide what to remove and what to keep
-  ## based on the stations of interest
+  # Go through all unpacked files, decide what to remove and what to keep
+  # based on the stations of interest
   files_all <- list.files(path = tempdir(), pattern = "^.*\\.csv$", recursive = TRUE, full.names = FALSE)
-  # files_stations <- paste0(stns, ".csv")
-  files_stations <- purrr::cross(list(x1 = paste0(yrs, "/"), x2 = paste0(stns, ".csv"))) %>%
+  
+  # Get a cartesian join of all stations of interest and all years.
+  files_stations <- 
+    purrr::cross(list(x1 = paste0(yrs, "/"), x2 = paste0(stns, ".csv"))) %>%
     purrr::map(purrr::lift(paste0)) %>%
     as_vector()
   
   files_keep <- subset(files_all, files_all %in% files_stations)
+  # I don't think files_remove is necessary anymore,since reformat_GSOD picks up only files that are in files_keep.
   files_remove <- subset(files_all, !(files_all %in% files_stations))
   file.remove(files_remove, recursive = TRUE)
   
   # Transform weather data ----------------------------------------------------
-  out <- GSODR::reformat_GSOD(file_list = paste(tempdir(),files_keep, sep="/"))
+  out <- GSODR::reformat_GSOD(file_list = paste(tempdir(), files_keep, sep = "/"))
   unlink(tempdir(), force = TRUE, recursive = TRUE)
   out
 }
@@ -78,14 +36,16 @@ get_weather <- function(yrs = seq(year(today()) - 11, year(today())),
 #                         destfile = "data/isd-history.txt")
 # }
 
-colnames_tolower <- function(data){
+colnames_tolower <- function(data) {
   colnames(data) <-  tolower(colnames(data))
   out <- data
-  }
+}
 
 get_cities <- function() {
-  curl::curl_download("https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.4.zip",
-                                      destfile = "data/cities.zip")
+  curl::curl_download(
+    "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.4.zip",
+    destfile = "data/cities.zip"
+  )
   unzip_cities <-  unzip("data/cities.zip", exdir = "data/")
   unlink("data/cities.zip")
   out <- read_csv("data/worldcities.csv") %>%
