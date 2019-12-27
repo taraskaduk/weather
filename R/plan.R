@@ -208,7 +208,9 @@ data_completed = full_data_filtered %>%
     bind_rows(data_filtered),
 
 data_collapsed = data_completed %>% 
-  group_by(location_id, date, year, yday) %>% 
+  mutate(year = year(date),
+         yday = yday(date)) %>% 
+  group_by(location_id, date, year, date) %>% 
   summarise_all(max, na.rm = TRUE) %>% 
   ungroup() %>% 
   mutate_at(vars(rh:es), ~if_else(is.nan(.x) | is.infinite(.x), NA_real_, .x)) %>% 
