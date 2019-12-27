@@ -1,17 +1,36 @@
 type,country,location_id,name,name_short,population,lat,lon
 cbsa,United States,cbsa12420,"Austin-Round Rock, TX",Austin,2247267,30.28164,-97.730949999999993
+cbsa,United States,cbsa12540,"Bakersfield, CA",Bakersfield,776557,35.41066,-118.83708
+cbsa,United States,cbsa12940,"Baton Rouge, LA",Baton Rouge,719040,30.433016666666667,-91.102925
+cbsa,United States,cbsa16700,"Charleston-North Charleston, SC",Charleston,937515,32.9281875,-80.03415
+cbsa,United States,cbsa17820,"Colorado Springs, CO",Colorado Springs,676221,38.89672,-104.85072
+cbsa,United States,cbsa22220,"Fayetteville-Springdale-Rogers, AR-MO",Fayetteville,610353,36.2684,-94.23291
+cbsa,United States,cbsa29460,"Lakeland-Winter Haven, FL",Lakeland,613196,27.966377777777776,-81.72753333333334
+cbsa,United States,cbsa37340,"Palm Bay-Melbourne-Titusville, FL",Palm Bay,729470,28.25028,-80.67399
 cbsa,United States,cbsa38060,"Phoenix-Mesa-Scottsdale, AZ",Phoenix,6681218,33.39325925925926,-111.99645925925925
 cbsa,United States,cbsa40060,"Richmond, VA",Richmond,1121915,37.40994,-77.40676
 cbsa,United States,cbsa41700,"San Antonio-New Braunfels, TX",San Antonio,2325674,29.50039090909091,-98.4484409090909
 cbsa,United States,cbsa41740,"San Diego-Carlsbad, CA",San Diego,4575877,32.90339411764706,-117.12525294117647
+cbsa,United States,cbsa42540,"Scranton--Wilkes-Barre--Hazleton, PA",Scranton,590921,41.35250588235294,-75.74054705882352
 cbsa,United States,cbsa45300,"Tampa-St. Petersburg-Clearwater, FL",Tampa,3576173,27.993704761904763,-82.60471428571428
+cbsa,United States,cbsa46520,"Urban Honolulu, HI",Urban Honolulu,836995,21.3293,-157.846
 city,Afghanistan,city1004993580,Kabul,Kabul,3277000,34.5167,69.1833
+city,Albania,city1008162156,Tirana,Tirana,895350,41.3275,19.8189
+city,Algeria,city1012045589,Blida,Blida,511348,36.4203,2.83
+city,Algeria,city1012126319,Oran,Oran,798000,35.71,-0.62
+city,Algeria,city1012275076,Constantine,Constantine,605179,36.36,6.5999
+city,Algeria,city1012600001,Annaba,Annaba,503524,36.92,7.76
 city,Algeria,city1012973369,Algiers,Algiers,3354000,36.7631,3.0506
+city,Argentina,city1032233996,Tucumán,Tucumán,830000,-26.816,-65.2166
+city,Argentina,city1032403831,La Plata,La Plata,694253,-34.9096,-57.96
+city,Argentina,city1032433516,Mendoza,Mendoza,893000,-32.8833,-68.8166
+city,Argentina,city1032456103,Mar del Plata,Mar del Plata,555897,-38,-57.58
 city,Argentina,city1032717330,Buenos Aires,Buenos Aires,12795000,-34.6025,-58.3975
 city,Argentina,city1032770677,Rosario,Rosario,1203000,-32.9511,-60.6663
 city,Argentina,city1032803249,Córdoba,Córdoba,1452000,-31.4,-64.1823
 city,Armenia,city1051074169,Yerevan,Yerevan,1102000,40.1812,44.5136
 city,Australia,city1036074917,Sydney,Sydney,4630000,-33.92,151.1852
+city,Australia,city1036153217,Gold Coast,Gold Coast,527660,-28.0815,153.4482
 city,Australia,city1036178956,Perth,Perth,1532000,-31.955,115.84
 city,Australia,city1036192929,Brisbane,Brisbane,1860000,-27.455,153.0351
 city,Australia,city1036468001,Newcastle,Newcastle,1134616,-32.8453,151.815
@@ -19,268 +38,557 @@ city,Australia,city1036533631,Melbourne,Melbourne,4170000,-37.82,144.975
 city,Australia,city1036538171,Adelaide,Adelaide,1145000,-34.935,138.6
 city,Austria,city1040261752,Vienna,Vienna,2400000,48.2,16.3666
 city,Azerbaijan,city1031946365,Baku,Baku,2122300,40.3953,49.8622
+city,Bahrain,city1048989486,Manama,Manama,563920,26.2361,50.5831
 city,Bangladesh,city1050529279,Dhaka,Dhaka,12797394,23.7231,90.4086
 city,Belarus,city1112348503,Minsk,Minsk,1805000,53.9,27.5666
+city,Belgium,city1056168623,Antwerpen,Antwerpen,920000,51.2204,4.415
 city,Belgium,city1056469830,Brussels,Brussels,1743000,50.8333,4.3333
+city,Belgium,city1056513284,Liège,Liège,749110,50.63,5.58
+city,Benin,city1204955174,Cotonou,Cotonou,762000,6.4,2.52
 city,Bolivia,city1068000064,La Paz,La Paz,1590000,-16.498,-68.15
 city,Bolivia,city1068002564,Santa Cruz,Santa Cruz,2102998,-17.7539,-63.226
 city,Bolivia,city1068793894,Cochabamba,Cochabamba,1000000,-17.41,-66.17
+city,Bosnia And Herzegovina,city1070966777,Sarajevo,Sarajevo,696731,43.85,18.383
+city,Brazil,city1076000699,Jaboatao,Jaboatao,702621,-8.11,-35.02
+city,Brazil,city1076009922,Canoas,Canoas,600000,-29.92,-51.18
 city,Brazil,city1076033299,Santos,Santos,1709000,-23.9537,-46.3329
 city,Brazil,city1076034054,Goiânia,Goiânia,2022000,-16.72,-49.3
+city,Brazil,city1076050637,Joinville,Joinville,988000,-26.32,-48.8399
+city,Brazil,city1076112309,Cuiabá,Cuiabá,806000,-15.5696,-56.085
 city,Brazil,city1076137337,Recife,Recife,3651000,-8.0756,-34.9156
 city,Brazil,city1076144436,Brasília,Brasília,3716996,-15.7833,-47.9161
 city,Brazil,city1076145766,Campinas,Campinas,2791000,-22.9,-47.1
+city,Brazil,city1076174955,São José dos Pinhais,São José dos Pinhais,665063,-25.57,-49.18
 city,Brazil,city1076190259,Florianópolis,Florianópolis,1023000,-27.58,-48.52
+city,Brazil,city1076221386,Novo Hamburgo,Novo Hamburgo,876990,-29.7096,-51.14
+city,Brazil,city1076339714,Nova Iguaçu,Nova Iguaçu,844583,-22.74,-43.47
 city,Brazil,city1076376829,Vitória,Vitória,1704000,-20.324,-40.366
 city,Brazil,city1076404077,Vila Velha,Vila Velha,1209091,-20.3676,-40.318
 city,Brazil,city1076440479,Maceió,Maceió,1186000,-9.62,-35.73
+city,Brazil,city1076495001,Uberlândia,Uberlândia,563536,-18.9,-48.28
 city,Brazil,city1076501425,Niterói,Niterói,1500513,-22.9,-43.1
+city,Brazil,city1076524478,Ribeirão Preto,Ribeirão Preto,551267,-21.17,-47.83
+city,Brazil,city1076527830,Aracaju,Aracaju,685356,-10.9,-37.12
 city,Brazil,city1076532519,São Paulo,São Paulo,18845000,-23.5587,-46.625
 city,Brazil,city1076567885,Fortaleza,Fortaleza,3602319,-3.75,-38.58
 city,Brazil,city1076607274,Manaus,Manaus,1753000,-3.1,-60
+city,Brazil,city1076625886,Santo André,Santo André,662373,-23.6528,-46.5278
 city,Brazil,city1076658221,Porto Alegre,Porto Alegre,3917000,-30.05,-51.2
+city,Brazil,city1076660445,Campo Grande,Campo Grande,778000,-20.45,-54.6166
 city,Brazil,city1076697777,Natal,Natal,1088000,-5.78,-35.24
 city,Brazil,city1076701712,Curitiba,Curitiba,3084000,-25.42,-49.32
+city,Brazil,city1076723241,Londrina,Londrina,520238,-23.3,-51.18
+city,Brazil,city1076727667,Teresina,Teresina,907000,-5.095,-42.78
+city,Brazil,city1076783887,São José dos Campos,São José dos Campos,753769,-23.2,-45.8799
+city,Brazil,city1076784718,Olinda,Olinda,921840,-8,-34.85
 city,Brazil,city1076819308,São Luís,São Luís,1038000,-2.516,-44.266
 city,Brazil,city1076887657,Rio de Janeiro,Rio de Janeiro,11748000,-22.925,-43.225
+city,Brazil,city1076922014,João Pessoa,João Pessoa,956000,-7.1011,-34.8761
 city,Brazil,city1076923789,Salvador,Salvador,3484000,-12.97,-38.48
 city,Brazil,city1076967355,Belo Horizonte,Belo Horizonte,5575000,-19.915,-43.915
+city,Brazil,city1076998392,Jundiaí,Jundiaí,505548,-23.2,-46.88
 city,Bulgaria,city1100762037,Sofia,Sofia,1185000,42.6833,23.3167
 city,Burkina Faso,city1854029208,Ouagadougou,Ouagadougou,1149000,12.3703,-1.5247
+city,Burma,city1104468217,Mandalay,Mandalay,1300000,21.97,96.085
 city,Burma,city1104616656,Rangoon,Rangoon,4088000,16.7834,96.1667
 city,Cambodia,city1116260534,Phnom Penh,Phnom Penh,1466000,11.55,104.9166
 city,Cameroon,city1120298240,Yaounde,Yaounde,1611000,3.8667,11.5167
 city,Cameroon,city1120494607,Douala,Douala,1906000,4.0604,9.71
+city,Canada,city1124224963,Winnipeg,Winnipeg,632063,49.883,-97.166
 city,Canada,city1124279679,Toronto,Toronto,5213000,43.7,-79.42
 city,Canada,city1124290735,Edmonton,Edmonton,1058000,53.55,-113.5
 city,Canada,city1124399363,Ottawa,Ottawa,1145000,45.4167,-75.7
+city,Canada,city1124567288,Hamilton,Hamilton,721053,43.25,-79.83
 city,Canada,city1124586170,Montréal,Montréal,3678000,45.5,-73.5833
 city,Canada,city1124690423,Calgary,Calgary,1110000,51.083,-114.08
+city,Canada,city1124823933,Québec,Québec,624177,46.84,-71.2456
 city,Canada,city1124825478,Vancouver,Vancouver,2313328,49.2734,-123.1216
+city,Central African Republic,city1140080881,Bangui,Bangui,831925,4.3666,18.5583
+city,Chad,city1148708596,Ndjamena,Ndjamena,989000,12.1131,15.0491
 city,Chile,city1152554349,Santiago,Santiago,5720000,-33.45,-70.667
+city,Chile,city1152838958,Concepción,Concepción,889725,-36.83,-73.05
 city,China,city1156029637,Datong,Datong,1873000,40.08,113.3
+city,China,city1156032841,Rizhao,Rizhao,865000,35.4304,119.45
+city,China,city1156035381,Lianyungang,Lianyungang,715600,34.6004,119.17
+city,China,city1156041962,Zhuzhou,Zhuzhou,1080000,27.83,113.15
+city,China,city1156046704,Jinxi,Jinxi,2426000,40.7503,120.83
 city,China,city1156051276,Ürümqi,Ürümqi,2151000,43.805,87.575
+city,China,city1156063295,Siping,Siping,555609,43.17,124.33
 city,China,city1156069315,Luoyang,Luoyang,1715000,34.68,112.4701
 city,China,city1156073548,Shanghai,Shanghai,14987000,31.2165,121.4365
+city,China,city1156078103,Changchun,Changchun,3183000,43.865,125.34
 city,China,city1156081448,Xining,Xining,1048000,36.62,101.77
+city,China,city1156086320,Linyi,Linyi,2082000,35.08,118.33
 city,China,city1156095188,Taian,Taian,1629000,36.2,117.1201
 city,China,city1156097909,Benxi,Benxi,1012000,41.3304,123.75
+city,China,city1156101096,Baoji,Baoji,800000,34.38,107.15
+city,China,city1156107603,Yibin,Yibin,902000,28.77,104.57
 city,China,city1156112588,Qingdao,Qingdao,2866000,36.09,120.33
+city,China,city1156113193,Kashgar,Kashgar,543914,39.4763,75.9699
 city,China,city1156117184,Wuhan,Wuhan,7243000,30.58,114.27
 city,China,city1156120117,Xianyang,Xianyang,1126000,34.3456,108.7147
+city,China,city1156123172,Yangjiang,Yangjiang,872363,21.8504,111.97
+city,China,city1156135890,Qingyuan,Qingyuan,706717,23.7004,113.0301
 city,China,city1156137209,Tianshui,Tianshui,1225000,34.6,105.92
+city,China,city1156157151,Jinzhou,Jinzhou,956000,41.1204,121.1
 city,China,city1156158707,Shenzhen,Shenzhen,7581000,22.5524,114.1221
+city,China,city1156163376,Jincheng,Jincheng,760000,35.5004,112.83
+city,China,city1156166828,Changping,Changping,614821,40.2248,116.1944
 city,China,city1156170787,Ningbo,Ningbo,1923000,29.88,121.55
 city,China,city1156174046,Tianjin,Tianjin,7180000,39.13,117.2
 city,China,city1156175472,Dalian,Dalian,3167000,38.9228,121.6298
+city,China,city1156177817,Yuci,Yuci,840000,37.6804,112.73
+city,China,city1156178316,Dandong,Dandong,870000,40.1436,124.3936
+city,China,city1156183137,Zhengzhou,Zhengzhou,2636000,34.755,113.6651
 city,China,city1156183327,Haikou,Haikou,2046189,20.05,110.32
 city,China,city1156188037,Fuzhou,Fuzhou,2606000,26.08,119.3
+city,China,city1156188829,Wenzhou,Wenzhou,2350000,28.02,120.6501
 city,China,city1156192287,Nanyang,Nanyang,1944000,33.0004,112.53
+city,China,city1156195684,Xiangtan,Xiangtan,2586948,27.8504,112.9
 city,China,city1156198892,Nanchang,Nanchang,2350000,28.68,115.88
+city,China,city1156202014,Anyang,Anyang,887000,36.08,114.35
+city,China,city1156202749,Liaoyang,Liaoyang,794000,41.28,123.18
+city,China,city1156203130,Leshan,Leshan,1157000,29.5671,103.7333
+city,China,city1156206041,Jiujiang,Jiujiang,545616,29.73,115.98
+city,China,city1156207794,Zhanyi,Zhanyi,652604,25.6005,103.8166
 city,China,city1156210167,Hohhot,Hohhot,1726000,40.82,111.66
 city,China,city1156217541,Shijianzhuang,Shijianzhuang,2417000,38.05,114.48
 city,China,city1156225008,Heze,Heze,1338000,35.23,115.45
 city,China,city1156228865,Beijing,Beijing,11106000,39.9289,116.3883
+city,China,city1156229590,Yichun,Yichun,982000,27.8333,114.4
+city,China,city1156235364,Guilin,Guilin,987000,25.28,110.28
+city,China,city1156237133,Guangzhou,Guangzhou,8829000,23.145,113.325
+city,China,city1156238875,Anqing,Anqing,580497,30.5,117.05
 city,China,city1156241528,Harbin,Harbin,3621000,45.75,126.65
 city,China,city1156241678,Xuzhou,Xuzhou,2091000,34.28,117.18
 city,China,city1156244079,Xian,Xian,4009000,34.275,108.895
 city,China,city1156249698,Mudangiang,Mudangiang,1244000,44.575,129.59
+city,China,city1156254380,Shashi,Shashi,520000,30.32,112.23
+city,China,city1156255316,Xingyi,Xingyi,816000,25.0904,104.89
 city,China,city1156255711,Ankang,Ankang,1100000,32.68,109.02
 city,China,city1156256829,Baoding,Baoding,1107000,38.8704,115.48
+city,China,city1156257074,Yingkow,Yingkow,795000,40.6703,122.28
 city,China,city1156273453,Xinyang,Xinyang,1541000,32.1304,114.07
+city,China,city1156275243,Hangzhou,Hangzhou,3007000,30.25,120.17
 city,China,city1156277458,Chifeng,Chifeng,1277000,42.27,118.95
+city,China,city1156278215,Jian,Jian,520248,27.1304,115
+city,China,city1156280566,Lanzhou,Lanzhou,2561000,36.056,103.792
+city,China,city1156294952,Xiangtai,Xiangtai,611739,37.05,114.5
 city,China,city1156309382,Shenyeng,Shenyeng,4787000,41.805,123.45
+city,China,city1156315512,Wuhu,Wuhu,810000,31.3504,118.37
 city,China,city1156332710,Hefei,Hefei,2035000,31.85,117.28
+city,China,city1156358686,Tongliao,Tongliao,884000,43.62,122.27
+city,China,city1156359072,Yinchuan,Yinchuan,991000,38.468,106.273
 city,China,city1156360785,Liuzhou,Liuzhou,1497000,24.28,109.25
+city,China,city1156393765,Jixi,Jixi,965000,45.3,130.97
+city,China,city1156403962,Daqing,Daqing,1693000,46.58,125
 city,China,city1156417758,Mianyang,Mianyang,1396000,31.47,104.77
+city,China,city1156421449,Beihai,Beihai,728978,21.4804,109.1
 city,China,city1156421555,Chengdu,Chengdu,4123000,30.67,104.07
+city,China,city1156424311,Xuanzhou,Xuanzhou,866000,30.9525,118.7553
 city,China,city1156449091,Changde,Changde,1469000,29.03,111.68
 city,China,city1156457499,Shantou,Shantou,1601000,23.37,116.67
 city,China,city1156477539,Kunming,Kunming,2931000,25.07,102.68
+city,China,city1156478242,Dongguan,Dongguan,4528000,23.0489,113.7447
+city,China,city1156499624,Luan,Luan,1690000,31.7503,116.48
+city,China,city1156504601,Jining,Jining,1186000,35.4004,116.55
 city,China,city1156522457,Nanchong,Nanchong,2174000,30.7804,106.13
 city,China,city1156546994,Baoshan,Baoshan,1000000,25.12,99.15
 city,China,city1156582079,Luzhou,Luzhou,1537000,28.88,105.38
+city,China,city1156605439,Nanning,Nanning,2167000,22.82,108.32
+city,China,city1156617066,Shaoguan,Shaoguan,720266,24.8,113.58
 city,China,city1156632014,Taiyuan,Taiyuan,2913000,37.875,112.5451
+city,China,city1156644065,Nanjing,Nanjing,3679000,32.05,118.78
 city,China,city1156662372,Huaiyin,Huaiyin,1264000,33.58,119.03
 city,China,city1156694479,Yongzhou,Yongzhou,1000000,26.2304,111.62
+city,China,city1156696884,Hengyang,Hengyang,1016000,26.88,112.59
+city,China,city1156698069,Cangzhou,Cangzhou,527681,38.3204,116.87
+city,China,city1156722242,Zhuhai,Zhuhai,1023000,22.2769,113.5678
+city,China,city1156738403,Foshan,Foshan,943000,23.0301,113.12
+city,China,city1156757274,Yichun,Yichun,777000,47.6999,128.9
+city,China,city1156764447,Yichang,Yichang,875000,30.7,111.28
 city,China,city1156775905,Qiqihar,Qiqihar,1641000,47.345,123.99
+city,China,city1156785303,Maoming,Maoming,1217715,21.9204,110.87
+city,China,city1156795164,Yueyang,Yueyang,826000,29.3801,113.1
 city,China,city1156800221,Zhangjiakou,Zhangjiakou,1046000,40.83,114.93
 city,China,city1156832475,Ganzhou,Ganzhou,1500000,25.92,114.95
+city,China,city1156847452,Maanshan,Maanshan,1366302,31.7304,118.48
+city,China,city1156857743,Fushun,Fushun,1470000,41.8654,123.87
+city,China,city1156893449,Shaoxing,Shaoxing,777000,30.0004,120.57
 city,China,city1156904299,Tangshan,Tangshan,1879000,39.6243,118.1944
 city,China,city1156912965,Weifang,Weifang,1553000,36.7204,119.1001
+city,China,city1156924687,Zhaotang,Zhaotang,809000,27.3204,103.72
 city,China,city1156932620,Guiyang,Guiyang,3662000,26.58,106.72
 city,China,city1156936556,Chongqing,Chongqing,6461000,29.565,106.595
 city,China,city1156961497,Changsha,Changsha,2604000,28.2,112.97
 city,China,city1156972469,Jinan,Jinan,2798000,36.675,116.995
 city,Colombia,city1170179113,Barranquilla,Barranquilla,1798000,10.96,-74.8
+city,Colombia,city1170386718,Pereira,Pereira,568750,4.8104,-75.68
 city,Colombia,city1170417589,Cali,Cali,2254000,3.4,-76.5
+city,Colombia,city1170423489,Bello,Bello,519670,6.33,-75.57
 city,Colombia,city1170483426,Bogota,Bogota,7772000,4.5964,-74.0833
 city,Colombia,city1170680389,Medellín,Medellín,3297000,6.275,-75.575
+city,Colombia,city1170743755,Cúcuta,Cúcuta,722146,7.92,-72.52
+city,Colombia,city1170765625,Soledad,Soledad,698852,10.92,-74.77
+city,Colombia,city1170886102,Cartagena,Cartagena,887000,10.3997,-75.5144
 city,Colombia,city1170940590,Bucaramanga,Bucaramanga,1009000,7.1301,-73.1259
 city,Congo (Brazzaville),city1178340306,Brazzaville,Brazzaville,1355000,-4.2592,15.2847
+city,Congo (Brazzaville),city1178411563,Pointe-Noire,Pointe-Noire,659084,-4.77,11.88
 city,Congo (Kinshasa),city1180000363,Kinshasa,Kinshasa,7843000,-4.3297,15.315
 city,Costa Rica,city1188749877,San José,San José,1284000,9.935,-84.0841
+city,Croatia,city1191233290,Zagreb,Zagreb,722526,45.8,16
 city,Cuba,city1192752771,Havana,Havana,2174000,23.132,-82.3642
+city,Cuba,city1192766111,Santiago de Cuba,Santiago de Cuba,555865,20.025,-75.8213
 city,Czechia,city1203744823,Prague,Prague,1162000,50.0833,14.466
 city,C𴥠DӉvoire,city1384207980,Abidjan,Abidjan,3802000,5.32,-4.04
 city,Denmark,city1208763942,København,København,1085000,55.6786,12.5635
 city,Dominican Republic,city1214636202,Santo Domingo,Santo Domingo,2154000,18.4701,-69.9001
+city,Dominican Republic,city1214985348,Santiago,Santiago,1550753,19.5,-70.67
 city,Ecuador,city1218441993,Quito,Quito,1701000,-0.215,-78.5001
 city,Egypt,city1818253931,Cairo,Cairo,11893000,30.05,31.25
+city,Egypt,city1818495972,Suez,Suez,508335,30.005,32.5499
+city,Egypt,city1818607968,El Minya,El Minya,500000,28.09,30.75
+city,Egypt,city1818628574,Bur Said,Bur Said,623864,31.26,32.29
 city,Egypt,city1818695837,Alexandria,Alexandria,4165000,31.2,29.95
 city,Egypt,city1818925479,El Giza,El Giza,2681863,30.01,31.19
+city,Egypt,city1818948225,Luxor,Luxor,609248,25.7,32.65
 city,El Salvador,city1222647454,San Salvador,San Salvador,1433000,13.71,-89.203
 city,Ethiopia,city1231824991,Addis Ababa,Addis Ababa,3100000,9.0333,38.7
 city,Finland,city1246177997,Helsinki,Helsinki,1115000,60.1756,24.9341
 city,France,city1250015082,Paris,Paris,9904000,48.8667,2.3333
 city,France,city1250071961,Lille,Lille,1044000,50.65,3.08
 city,France,city1250196189,Lyon,Lyon,1423000,45.77,4.83
+city,France,city1250258110,Toulouse,Toulouse,847000,43.62,1.4499
+city,France,city1250372069,Rouen,Rouen,532559,49.4304,1.08
+city,France,city1250449238,Bordeaux,Bordeaux,803000,44.85,-0.595
 city,France,city1250774071,Marseille,Marseille,1400000,43.29,5.375
+city,France,city1250774553,Nice,Nice,927000,43.715,7.265
+city,Georgia,city1268203191,Tbilisi,Tbilisi,1100000,41.725,44.7908
+city,Germany,city1276004611,Wuppertal,Wuppertal,776525,51.25,7.17
 city,Germany,city1276015998,Cologne,Cologne,1004000,50.93,6.95
 city,Germany,city1276041799,Hamburg,Hamburg,1757000,53.55,10
 city,Germany,city1276054552,Frankfurt,Frankfurt,2895000,50.1,8.675
 city,Germany,city1276150104,Mannheim,Mannheim,2362000,49.5004,8.47
+city,Germany,city1276166609,Nürnberg,Nürnberg,737304,49.45,11.08
 city,Germany,city1276171358,Stuttgart,Stuttgart,2944700,48.78,9.2
+city,Germany,city1276376509,Bremen,Bremen,724909,53.08,8.8
+city,Germany,city1276419711,Saarbrücken,Saarbrücken,770001,49.2504,6.97
 city,Germany,city1276451290,Berlin,Berlin,3406000,52.5218,13.4015
+city,Germany,city1276457707,Hannover,Hannover,722490,52.367,9.7167
+city,Germany,city1276561036,Dresden,Dresden,617515,51.05,13.75
+city,Germany,city1276562886,Dortmund,Dortmund,588462,51.53,7.45
+city,Germany,city1276563678,Leipzig,Leipzig,542529,51.3354,12.41
 city,Germany,city1276615258,Düsseldorf,Düsseldorf,1220000,51.2204,6.78
+city,Germany,city1276652118,Wiesbaden,Wiesbaden,617126,50.0804,8.25
+city,Germany,city1276692352,Munich,Munich,1275000,48.1299,11.575
 city,Germany,city1276769247,Essen,Essen,1742135,51.45,7.0166
+city,Germany,city1276807850,Bonn,Bonn,680543,50.7205,7.08
 city,Germany,city1276977172,Duisburg,Duisburg,1276757,51.43,6.75
 city,Ghana,city1288299415,Accra,Accra,2121000,5.55,-0.2167
+city,Greece,city1300397999,Thessaloniki,Thessaloniki,828000,40.6961,22.885
 city,Greece,city1300715560,Athens,Athens,3242000,37.9833,23.7333
+city,Guatemala,city1320083599,Quetzaltenango,Quetzaltenango,575263,14.83,-91.52
 city,Guatemala,city1320197916,Guatemala,Guatemala,1024000,14.6211,-90.527
 city,Guinea,city1324568159,Conakry,Conakry,1494000,9.5315,-13.6802
+city,Honduras,city1340568412,San Pedro Sula,San Pedro Sula,680091,15.5,-88.03
 city,Hong Kong,city1344982653,Hong Kong,Hong Kong,7206000,22.305,114.185
 city,Hungary,city1348611435,Budapest,Budapest,1679000,47.5,19.0833
+city,India,city1356004790,Hisar,Hisar,544829,29.17,75.725
+city,India,city1356010401,Kozhikode,Kozhikode,953000,11.2504,75.77
 city,India,city1356013205,Faridabad,Faridabad,1394000,28.4333,77.3167
+city,India,city1356024354,Thiruvananthapuram,Thiruvananthapuram,954000,8.5,76.95
 city,India,city1356060520,Kolkata,Kolkata,14787000,22.495,88.324700000000007
 city,India,city1356071083,Bhilai,Bhilai,1097000,21.2167,81.4333
 city,India,city1356081074,Pune,Pune,4672000,18.53,73.85
+city,India,city1356089496,Akola,Akola,503502,20.71,77.01
+city,India,city1356093694,Asansol,Asansol,1328000,23.6833,86.9833
 city,India,city1356110588,Ranchi,Ranchi,1044000,23.37,85.33
 city,India,city1356115460,Jabalpur,Jabalpur,1285000,23.1751,79.9551
+city,India,city1356140143,Bhubaneshwar,Bhubaneshwar,844000,20.2704,85.8274
 city,India,city1356145782,Varanasi,Varanasi,1352000,25.33,83
+city,India,city1356172246,Kalyan,Kalyan,1576614,19.2502,73.1602
+city,India,city1356190221,Gorakhpur,Gorakhpur,674246,26.7504,83.38
 city,India,city1356226629,Mumbai,Mumbai,18978000,19.017,72.857
+city,India,city1356280972,Nellore,Nellore,678004,14.44,79.9899
 city,India,city1356293537,Jaipur,Jaipur,2917000,26.9211,75.81
 city,India,city1356304381,Ahmedabad,Ahmedabad,5375000,23.0301,72.58
 city,India,city1356314385,Sholapur,Sholapur,1057000,17.6704,75.9
 city,India,city1356317190,Rajkot,Rajkot,1260000,22.31,70.8
+city,India,city1356363967,Gwalior,Gwalior,978000,26.23,78.1801
 city,India,city1356365743,Nagpur,Nagpur,2454000,21.17,79.09
 city,India,city1356374944,Chennai,Chennai,7163000,13.09,80.28
+city,India,city1356374983,Raipur,Raipur,875000,21.235,81.635
+city,India,city1356390535,Belgaum,Belgaum,608756,15.865,74.505
 city,India,city1356402812,Indore,Indore,2026000,22.7151,75.865
 city,India,city1356410365,Bangalore,Bangalore,6787000,12.97,77.56
 city,India,city1356442950,Srinagar,Srinagar,1140000,34.1,74.815
+city,India,city1356491738,Jammu,Jammu,791000,32.7118,74.8467
 city,India,city1356501259,Jamshedpur,Jamshedpur,1300000,22.7875,86.1975
+city,India,city1356539761,Tiruppur,Tiruppur,650000,11.0804,77.33
 city,India,city1356562598,Nasik,Nasik,1473000,20.0004,73.78
+city,India,city1356593800,Guwahati,Guwahati,983000,26.16,91.77
 city,India,city1356691871,Ghaziabad,Ghaziabad,1341000,28.6604,77.4084
+city,India,city1356698199,Bareilly,Bareilly,817000,28.3454,79.42
+city,India,city1356727084,Jodhpur,Jodhpur,995000,26.2918,73.0168
 city,India,city1356734039,Bhopal,Bhopal,1727000,23.25,77.41
 city,India,city1356758738,Surat,Surat,3842000,21.2,72.84
+city,India,city1356763571,Bhiwandi,Bhiwandi,795000,19.35,73.13
+city,India,city1356820310,Kota,Kota,827000,25.18,75.835
 city,India,city1356821429,Patna,Patna,2158000,25.625,85.13
 city,India,city1356840670,Aurangabad,Aurangabad,1113000,19.8957,75.3203
 city,India,city1356871768,Hyderabad,Hyderabad,6376000,17.4,78.48
+city,India,city1356872061,Cuttack,Cuttack,580000,20.47,85.8899
 city,India,city1356872604,Delhi,Delhi,15926000,28.67,77.23
+city,India,city1356884472,Tiruchirappalli,Tiruchirappalli,951000,10.81,78.69
 city,India,city1356891790,Lucknow,Lucknow,2695000,26.855,80.915
 city,India,city1356926507,Amritsar,Amritsar,1212000,31.64,74.87
+city,India,city1356970407,Dehra Dun,Dehra Dun,714223,30.3204,78.05
+city,India,city1356972351,Mangalore,Mangalore,776632,12.9,74.85
 city,India,city1356986516,Haora,Haora,4841638,22.5804,88.3299
 city,India,city1356999503,Coimbatore,Coimbatore,1696000,11,76.95
 city,Indonesia,city1360006015,Bekasi,Bekasi,2378211,-6.2173,106.9723
 city,Indonesia,city1360051337,Ujungpandang,Ujungpandang,1262000,-5.14,119.432
+city,Indonesia,city1360084806,Pasuruan,Pasuruan,500000,-7.6296,112.9
+city,Indonesia,city1360243491,Bandar Lampung,Bandar Lampung,865000,-5.43,105.27
+city,Indonesia,city1360353144,Banda Aceh,Banda Aceh,513698,5.55,95.32
+city,Indonesia,city1360422679,Pekanbaru,Pekanbaru,799000,0.565,101.425
 city,Indonesia,city1360484663,Surabaya,Surabaya,2845000,-7.2492,112.7508
 city,Indonesia,city1360543171,Medan,Medan,2115000,3.58,98.65
+city,Indonesia,city1360684979,Samarinda,Samarinda,592228,-0.5,117.15
+city,Indonesia,city1360685223,Bandjarmasin,Bandjarmasin,603576,-3.33,114.5801
 city,Indonesia,city1360745537,Semarang,Semarang,1396000,-6.9666,110.42
 city,Indonesia,city1360771077,Jakarta,Jakarta,9125000,-6.1744,106.8294
+city,Indonesia,city1360771925,Bogor,Bogor,918000,-6.57,106.75
+city,Indonesia,city1360848527,Denpasar,Denpasar,732344,-8.65,115.22
+city,Indonesia,city1360884608,Binjai,Binjai,564979,3.6204,98.5001
+city,Indonesia,city1360900986,Padang,Padang,855000,-0.96,100.36
 city,Indonesia,city1360902897,Palembang,Palembang,1749000,-2.98,104.75
+city,Indonesia,city1360992394,Pontianak,Pontianak,607311,-0.03,109.32
 city,Iran,city1364023865,Isfahan,Isfahan,1628000,32.7,51.7
+city,Iran,city1364072353,Zahedan,Zahedan,598887,29.5,60.83
 city,Iran,city1364123206,Mashhad,Mashhad,2469000,36.27,59.57
+city,Iran,city1364126377,Hamadan,Hamadan,528256,34.796,48.515
 city,Iran,city1364141756,Tabriz,Tabriz,1413000,38.0863,46.3012
+city,Iran,city1364158221,Urmia,Urmia,577307,37.53,45
 city,Iran,city1364258511,Karaj,Karaj,1423000,35.8004,50.97
 city,Iran,city1364305026,Tehran,Tehran,7873000,35.6719,51.4243
+city,Iran,city1364350188,Ahvaz,Ahvaz,996000,31.28,48.72
 city,Iran,city1364432238,Shiraz,Shiraz,1240000,29.63,52.57
+city,Iran,city1364535690,Kermanshah,Kermanshah,828313,34.38,47.06
+city,Iran,city1364554896,Kerman,Kerman,577514,30.3,57.08
+city,Iran,city1364624691,Arak,Arak,503647,34.0804,49.7
+city,Iran,city1364630382,Rasht,Rasht,594590,37.3,49.63
+city,Iraq,city1368344172,Kirkuk,Kirkuk,601433,35.4722,44.3923
+city,Iraq,city1368578192,Irbil,Irbil,926000,36.179,44.0086
 city,Iraq,city1368596238,Baghdad,Baghdad,5054000,33.3386,44.3939
+city,Iraq,city1368597794,Karbala,Karbala,510692,32.6149,44.0245
+city,Iraq,city1368714645,Basra,Basra,870000,30.5135,47.8136
+city,Iraq,city1368916692,Al Hillah,Al Hillah,594605,32.4721,44.4217
 city,Ireland,city1372595407,Dublin,Dublin,1059000,53.3331,-6.2489
 city,Israel,city1376133727,Haifa,Haifa,1011000,32.8204,34.98
 city,Israel,city1376261644,Jerusalem,Jerusalem,1029300,31.7784,35.2066
 city,Israel,city1376401542,Tel Aviv-Yafo,Tel Aviv-Yafo,3112000,32.08,34.77
 city,Italy,city1380244627,Turin,Turin,1652000,45.0704,7.67
 city,Italy,city1380382862,Rome,Rome,3339000,41.896,12.4833
+city,Italy,city1380428434,Palermo,Palermo,863000,38.125,13.35
+city,Italy,city1380562508,Catania,Catania,674542,37.5,15.08
 city,Italy,city1380646673,Naples,Naples,2250000,40.84,14.245
+city,Italy,city1380716540,Genoa,Genoa,647497,44.41,8.93
 city,Italy,city1380724377,Milan,Milan,2945000,45.47,9.205
 city,Italy,city1380726561,Florence,Florence,1500000,43.78,11.25
+city,Italy,city1380863448,Salerno,Salerno,954265,40.6804,14.7699
+city,Italy,city1380991126,Bari,Bari,500577,41.1142,16.8728
 city,Japan,city1392000195,Sapporo,Sapporo,2544000,43.075,141.34
+city,Japan,city1392082102,Tsu,Tsu,500000,34.7171,136.5167
+city,Japan,city1392106283,Kumamoto,Kumamoto,718232,32.8009,130.7006
 city,Japan,city1392118339,Yokohama,Yokohama,3697894,35.32,139.58
+city,Japan,city1392120675,Kagoshima,Kagoshima,555352,31.586,130.5611
+city,Japan,city1392129541,Kitakyūshū,Kitakyūshū,997536,33.8704,130.82
+city,Japan,city1392164106,Ōtsu,Ōtsu,536976,35.0064,135.8674
+city,Japan,city1392172935,Hachiōji,Hachiōji,579399,35.6577,139.3261
+city,Japan,city1392174500,Hamamatsu,Hamamatsu,977023,34.7181,137.7327
+city,Japan,city1392220893,Matsuyama,Matsuyama,533541,33.8455,132.7658
+city,Japan,city1392235505,Shizuoka,Shizuoka,701561,34.9858,138.3854
 city,Japan,city1392373695,Hiroshima,Hiroshima,2045000,34.3878,132.4429
 city,Japan,city1392407472,Nagoya,Nagoya,3230000,35.155,136.915
 city,Japan,city1392419823,Ōsaka,Ōsaka,11294000,34.75,135.4601
 city,Japan,city1392457903,Sendai,Sendai,2250000,38.2871,141.0217
+city,Japan,city1392506125,Utsunomiya,Utsunomiya,667752,36.55,139.87
 city,Japan,city1392576294,Fukuoka,Fukuoka,2792000,33.595,130.41
+city,Japan,city1392583118,Naha,Naha,905238,26.2072,127.673
+city,Japan,city1392603439,Nagano,Nagano,594311,36.65,138.17
 city,Japan,city1392622735,Kyoto,Kyoto,1805000,35.03,135.75
+city,Japan,city1392684679,Kanazawa,Kanazawa,551249,36.56,136.64
 city,Japan,city1392685764,Tokyo,Tokyo,35676000,35.685,139.7514
 city,Japan,city1392879600,Kawasaki,Kawasaki,1437266,35.53,139.705
+city,Japan,city1392913753,Niigata,Niigata,569797,37.92,139.04
+city,Japan,city1392954750,Okayama,Okayama,866092,34.672,133.9171
 city,Japan,city1392978082,Kōbe,Kōbe,1528478,34.68,135.17
+city,Jordan,city1400161837,Az Zarqa,Az Zarqa,894691,32.07,36.1
 city,Jordan,city1400522593,Amman,Amman,1060000,31.95,35.9333
 city,Kazakhstan,city1398351701,Almaty,Almaty,1209000,43.325,76.915
 city,Kenya,city1404000661,Nairobi,Nairobi,3010000,-1.2833,36.8167
+city,Kenya,city1404512373,Mombasa,Mombasa,882000,-4.04,39.6899
+city,"Korea, North",city1408328889,Hungnam,Hungnam,751322,39.8231,127.6232
+city,"Korea, North",city1408482040,Hamhung,Hamhung,773000,39.9101,127.5454
+city,"Korea, North",city1408498177,Chongjin,Chongjin,672614,41.7846,129.79
 city,"Korea, North",city1408738594,Pyongyang,Pyongyang,3300000,39.0194,125.7547
+city,"Korea, North",city1408892768,Nampo,Nampo,1127000,38.7669,125.4524
 city,"Korea, South",city1410000087,Gwangju,Gwangju,1440000,35.171,126.9104
 city,"Korea, South",city1410095252,Daegu,Daegu,2460000,35.8668,128.607
 city,"Korea, South",city1410134602,Ulsan,Ulsan,1061000,35.5467,129.317
 city,"Korea, South",city1410160313,Incheon,Incheon,2550000,37.4761,126.6422
+city,"Korea, South",city1410428222,Puch'on,Puch'on,866000,37.4989,126.7831
+city,"Korea, South",city1410494847,Jeonju,Jeonju,711424,35.8314,127.1404
+city,"Korea, South",city1410511255,Goyang,Goyang,903000,37.6527,126.8372
+city,"Korea, South",city1410585171,Ansan,Ansan,739493,37.3481,126.8595
 city,"Korea, South",city1410592618,Changwon,Changwon,1081499,35.2191,128.5836
 city,"Korea, South",city1410601465,Busan,Busan,3480000,35.0951,129.01
+city,"Korea, South",city1410622472,Songnam,Songnam,942000,37.4386,127.1378
 city,"Korea, South",city1410679777,Suwon,Suwon,1078000,37.2578,127.0109
 city,"Korea, South",city1410836482,Seoul,Seoul,9796000,37.5663,126.9997
+city,"Korea, South",city1410964361,Cheongju,Cheongju,775096,36.6439,127.5012
 city,"Korea, South",city1410993875,Daejeon,Daejeon,1468000,36.3355,127.425
 city,Kuwait,city1414102075,Kuwait,Kuwait,2063000,29.3697,47.9783
+city,Kyrgyzstan,city1417191971,Bishkek,Bishkek,837000,42.8731,74.5852
+city,Laos,city1418732714,Vientiane,Vientiane,754000,17.9667,102.6
+city,Latvia,city1428586192,Riga,Riga,742572,56.95,24.1
 city,Lebanon,city1422847713,Beirut,Beirut,1846000,33.872,35.5097
+city,Liberia,city1430477826,Monrovia,Monrovia,1041000,6.3106,-10.8048
+city,Lithuania,city1440887149,Vilnius,Vilnius,542366,54.6834,25.3166
 city,Madagascar,city1450978461,Antananarivo,Antananarivo,1697000,-18.9166,47.5166
+city,Malaysia,city1458150101,Kota Baharu,Kota Baharu,505583,6.12,102.23
 city,Malaysia,city1458236750,George Town,George Town,2500000,5.4136,100.3294
+city,Malaysia,city1458423505,Ipoh,Ipoh,673318,4.6,101.065
+city,Malaysia,city1458462262,Kuching,Kuching,570407,1.53,110.33
+city,Malaysia,city1458467506,Malacca,Malacca,788706,2.2064,102.2465
+city,Malaysia,city1458469233,Butterworth,Butterworth,821652,5.4171,100.4
+city,Malaysia,city1458509635,Kelang,Kelang,956000,3.0204,101.55
+city,Malaysia,city1458747615,Johor Bahru,Johor Bahru,875000,1.48,103.73
 city,Malaysia,city1458988644,Kuala Lumpur,Kuala Lumpur,1448000,3.1667,101.7
 city,Mali,city1466965925,Bamako,Bamako,1494000,12.65,-8
+city,Mauritius,city1480131261,Port Louis,Port Louis,595491,-20.1666,57.5
+city,Mexico,city1484010310,Cancún,Cancún,542043,21.17,-86.83
+city,Mexico,city1484015319,Hermosillo,Hermosillo,595811,29.0989,-110.9541
 city,Mexico,city1484016661,Nezahualcoyotl,Nezahualcoyotl,1109363,19.41,-99.03
+city,Mexico,city1484060031,Tampico,Tampico,859419,22.3,-97.87
+city,Mexico,city1484107245,Saltillo,Saltillo,754000,25.42,-101.005
 city,Mexico,city1484124846,Toluca,Toluca,1531000,19.3304,-99.67
 city,Mexico,city1484215762,Torreón,Torreón,1144000,25.5701,-103.42
 city,Mexico,city1484247881,Mexico City,Mexico City,19028000,19.4424,-99.131
+city,Mexico,city1484301467,Oaxaca,Oaxaca,530728,17.0827,-96.6699
+city,Mexico,city1484335603,Chihuahua,Chihuahua,793000,28.645,-106.085
+city,Mexico,city1484359502,Tlaxcala,Tlaxcala,503878,19.32,-98.23
+city,Mexico,city1484396779,Mérida,Mérida,965000,20.9666,-89.6166
 city,Mexico,city1484416394,Puebla,Puebla,2195000,19.05,-98.2
+city,Mexico,city1484516810,Culiacán,Culiacán,809000,24.83,-107.38
 city,Mexico,city1484559591,Monterrey,Monterrey,3712000,25.67,-100.33
+city,Mexico,city1484583620,San Luis Potosí,San Luis Potosí,992000,22.17,-101
+city,Mexico,city1484604775,Querétaro,Querétaro,961000,20.63,-100.38
+city,Mexico,city1484614906,Matamoros,Matamoros,538785,25.88,-97.5
+city,Mexico,city1484666646,Aguascalientes,Aguascalientes,869000,21.8795,-102.2904
+city,Mexico,city1484669072,Morelia,Morelia,644306,19.7334,-101.1895
 city,Mexico,city1484708778,Tijuana,Tijuana,1553000,32.5,-117.08
+city,Mexico,city1484788702,Mexicali,Mexicali,885000,32.65,-115.48
+city,Mexico,city1484811199,León,León,1488000,21.15,-101.7
 city,Mexico,city1484840083,Ciudad Juárez,Ciudad Juárez,1343000,31.6904,-106.49
+city,Mexico,city1484926471,Cuernavaca,Cuernavaca,834001,18.9211,-99.24
 city,Mexico,city1484950208,Guadalajara,Guadalajara,4198000,20.67,-103.33
+city,Mexico,city1484992153,Veracruz,Veracruz,578963,19.1773,-96.16
+city,Moldova,city1498011437,Chișinău,Chișinău,688134,47.005,28.8577
+city,Mongolia,city1496024767,Ulaanbaatar,Ulaanbaatar,885000,47.9167,106.9166
+city,Morocco,city1504116858,Agadir,Agadir,825467,30.44,-9.62
+city,Morocco,city1504172585,Marrakesh,Marrakesh,872000,31.63,-8
 city,Morocco,city1504175315,Casablanca,Casablanca,3181000,33.6,-7.6164
+city,Morocco,city1504333193,Meknes,Meknes,697628,33.9004,-5.56
+city,Morocco,city1504861504,Tangier,Tangier,750060,35.7473,-5.8327
 city,Morocco,city1504861997,Fez,Fez,1002000,34.0546,-5.0004
 city,Mozambique,city1508074843,Maputo,Maputo,1446000,-25.9553,32.5892
+city,Mozambique,city1508768577,Matola,Matola,543907,-25.9696,32.46
 city,Netherlands,city1528355309,Amsterdam,Amsterdam,1031000,52.35,4.9166
 city,Netherlands,city1528799905,The Hague,The Hague,1406000,52.08,4.27
+city,Netherlands,city1528871692,Utrecht,Utrecht,640000,52.1003,5.12
 city,Netherlands,city1528892850,Rotterdam,Rotterdam,1005000,51.92,4.48
+city,Nicaragua,city1558296252,Managua,Managua,920000,12.153,-86.2685
+city,Niger,city1562932886,Niamey,Niamey,915000,13.5167,2.1167
 city,Nigeria,city1566593751,Lagos,Lagos,9466000,6.4433,3.3915
+city,Norway,city1578324706,Oslo,Oslo,835000,59.9167,10.75
+city,Oman,city1512035506,Muscat,Muscat,734697,23.6133,58.5933
+city,Pakistan,city1586038700,Bahawalpur,Bahawalpur,552607,29.39,71.675
 city,Pakistan,city1586129469,Karachi,Karachi,12130000,24.87,66.99
 city,Pakistan,city1586256291,Multan,Multan,1522000,30.2,71.455
+city,Pakistan,city1586306717,Islamabad,Islamabad,780000,33.7,73.1666
 city,Pakistan,city1586323916,Faisalabad,Faisalabad,2617000,31.41,73.11
 city,Pakistan,city1586344001,Rawalpindi,Rawalpindi,1858000,33.6,73.04
+city,Pakistan,city1586400472,Gujranwala,Gujranwala,1513000,32.1604,74.185
 city,Pakistan,city1586427790,Hyderabad,Hyderabad,1459000,25.38,68.375
+city,Pakistan,city1586556108,Quetta,Quetta,768000,30.22,67.025
 city,Pakistan,city1586619596,Saidu,Saidu,1860310,34.75,72.35
 city,Pakistan,city1586788758,Abbottabad,Abbottabad,1183647,34.1495,73.1995
 city,Pakistan,city1586801463,Lahore,Lahore,6577000,31.56,74.35
 city,Pakistan,city1586851102,Peshawar,Peshawar,1303000,34.005,71.535
 city,Panama,city1591672475,Panama City,Panama City,1281000,8.968,-79.533
 city,Paraguay,city1600057911,Asunción,Asunción,1870000,-25.2964,-57.6415
+city,Paraguay,city1600667303,San Lorenzo,San Lorenzo,500000,-25.34,-57.52
+city,Peru,city1604613706,Trujillo,Trujillo,765171,-8.12,-79.02
+city,Peru,city1604723954,Arequipa,Arequipa,815000,-16.42,-71.53
+city,Peru,city1604799615,Chiclayo,Chiclayo,596792,-6.7629,-79.8366
+city,Philippines,city1608189351,Zamboanga,Zamboanga,773000,6.92,122.08
 city,Philippines,city1608618140,Manila,Manila,11100000,14.6042,120.9822
 city,Philippines,city1608906877,Davao,Davao,1402000,7.11,125.63
 city,Philippines,city1608974097,Quezon City,Quezon City,2761720,14.6504,121.03
 city,Poland,city1616024847,Warsaw,Warsaw,1707000,52.25,21
+city,Poland,city1616108520,Wrocław,Wrocław,634893,51.1104,17.03
+city,Poland,city1616172264,Kraków,Kraków,756000,50.06,19.96
+city,Poland,city1616311376,Gliwice,Gliwice,507670,50.3304,18.67
+city,Poland,city1616406372,Gdańsk,Gdańsk,740000,54.36,18.64
+city,Poland,city1616725607,Poznań,Poznań,623997,52.4058,16.8999
+city,Poland,city1616740907,Bytom,Bytom,662247,50.35,18.91
 city,Poland,city1616798495,Katowice,Katowice,2746000,50.2604,19.02
+city,Poland,city1616832750,Łódź,Łódź,758000,51.775,19.4514
 city,Portugal,city1620356810,Porto,Porto,1337000,41.15,-8.62
 city,Portugal,city1620619017,Lisbon,Lisbon,2812000,38.7227,-9.1449
+city,Portugal,city1620949401,Braga,Braga,826833,41.555,-8.4213
 city,Qatar,city1634459660,Doha,Doha,1450000,25.2866,51.533
 city,Romania,city1642414442,Bucharest,Bucharest,1942000,44.4334,26.0999
 city,Russia,city1643012126,Nizhny Novgorod,Nizhny Novgorod,1278000,56.333,44.0001
+city,Russia,city1643017923,Tolyatti,Tolyatti,702879,53.4804,49.53
+city,Russia,city1643040435,Tyumen,Tyumen,519119,57.14,65.53
 city,Russia,city1643101260,Kazan,Kazan,1115000,55.7499,49.1263
+city,Russia,city1643175363,Khabarovsk,Khabarovsk,579000,48.455,135.12
+city,Russia,city1643205757,Samara,Samara,1137000,53.195,50.1513
 city,Russia,city1643224011,Chelyabinsk,Chelyabinsk,1091000,55.155,61.4387
+city,Russia,city1643258928,Tomsk,Tomsk,535479,56.495,84.975
+city,Russia,city1643318494,Moscow,Moscow,10452000,55.7522,37.6155
+city,Russia,city1643318931,Barnaul,Barnaul,599579,53.355,83.745
 city,Russia,city1643360863,Omsk,Omsk,1135000,54.99,73.4
 city,Russia,city1643399240,Novosibirsk,Novosibirsk,1389000,55.03,82.96
+city,Russia,city1643407929,Astrakhan,Astrakhan,502533,46.3487,48.055
+city,Russia,city1643438227,Krasnodar,Krasnodar,649851,45.02,39
+city,Russia,city1643439037,Irkutsk,Irkutsk,586695,52.32,104.245
+city,Russia,city1643492830,Penza,Penza,512602,53.18,45
+city,Russia,city1643544975,Krasnoyarsk,Krasnoyarsk,925000,56.014,92.866
+city,Russia,city1643556540,Saratov,Saratov,843000,51.58,46.03
+city,Russia,city1643577201,Volgograd,Volgograd,984000,48.71,44.5
+city,Russia,city1643580480,Makhachkala,Makhachkala,554981,42.98,47.5
 city,Russia,city1643582706,Yekaterinburg,Yekaterinburg,1313000,56.85,60.6
 city,Russia,city1643616350,St. Petersburg,St. Petersburg,4553000,59.939,30.316
+city,Russia,city1643668944,Ulyanovsk,Ulyanovsk,640680,54.33,48.41
+city,Russia,city1643685056,Orenburg,Orenburg,550204,51.78,55.11
+city,Russia,city1643700880,Perm,Perm,997000,58,56.25
+city,Russia,city1643722928,Ufa,Ufa,1018000,54.79,56.04
+city,Russia,city1643811064,Voronezh,Voronezh,844000,51.73,39.27
+city,Russia,city1643832017,Vladivostok,Vladivostok,587022,43.13,131.91
+city,Russia,city1643983138,Izhevsk,Izhevsk,631038,56.85,53.23
+city,Rwanda,city1646923541,Kigali,Kigali,860000,-1.9536,30.0605
 city,Saudi Arabia,city1682169241,Makkah,Makkah,1385000,21.43,39.82
 city,Saudi Arabia,city1682345785,Medina,Medina,1010000,24.5,39.58
 city,Saudi Arabia,city1682452296,Ad Damman,Ad Damman,2054710,26.4282,50.0997
+city,Saudi Arabia,city1682590992,Tabuk,Tabuk,547957,28.3838,36.555
 city,Saudi Arabia,city1682926944,Jeddah,Jeddah,3012000,21.5169,39.2192
+city,Saudi Arabia,city1682956102,At Taif,At Taif,657282,21.2622,40.3823
+city,Saudi Arabia,city1682958157,Al Hufuf,Al Hufuf,637389,25.3487,49.5856
+city,Saudi Arabia,city1682999334,Riyadh,Riyadh,4465000,24.6408,46.7727
 city,Senegal,city1686604760,Dakar,Dakar,2604000,14.7158,-17.4731
 city,Serbia,city1688374696,Belgrade,Belgrade,1099000,44.818600000000004,20.468
 city,Singapore,city1702341327,Singapore,Singapore,5183700,1.293,103.8558
@@ -289,98 +597,176 @@ city,South Africa,city1710176249,Pretoria,Pretoria,1338000,-25.7069,28.2294
 city,South Africa,city1710271883,Vereeniging,Vereeniging,1074000,-26.6496,27.96
 city,South Africa,city1710550792,Johannesburg,Johannesburg,3435000,-26.17,28.03
 city,South Africa,city1710680650,Cape Town,Cape Town,3215000,-33.92,18.435
+city,South Africa,city1710690280,Pietermaritzburg,Pietermaritzburg,750845,-29.61,30.39
 city,South Africa,city1710880986,Benoni,Benoni,2986000,-26.1496,28.3299
 city,South Africa,city1710918997,Port Elizabeth,Port Elizabeth,1021000,-33.97,25.6
+city,Spain,city1724331267,Bilbao,Bilbao,875552,43.25,-2.93
+city,Spain,city1724397372,Málaga,Málaga,550058,36.7204,-4.42
 city,Spain,city1724594040,Barcelona,Barcelona,4920000,41.3833,2.1834
 city,Spain,city1724616994,Madrid,Madrid,5567000,40.4,-3.6834
+city,Spain,city1724907391,Zaragoza,Zaragoza,649404,41.65,-0.89
+city,Spain,city1724981666,Valencia,Valencia,808000,39.485,-0.4
 city,Spain,city1724991838,Seville,Seville,1212045,37.405,-5.98
 city,Sudan,city1729268475,Khartoum,Khartoum,4754000,15.5881,32.5342
 city,Sudan,city1729912179,Omdurman,Omdurman,2395159,15.6167,32.48
+city,Sweden,city1752059374,Göteborg,Göteborg,537797,57.75,12
 city,Sweden,city1752425602,Stockholm,Stockholm,1264000,59.3508,18.0973
 city,Switzerland,city1756539143,Zürich,Zürich,1108000,47.38,8.55
+city,Switzerland,city1756731313,Basel,Basel,830000,47.5804,7.59
 city,Switzerland,city1756810813,Geneva,Geneva,1240000,46.21,6.14
+city,Syria,city1760013934,Hims,Hims,1005000,34.73,36.72
+city,Syria,city1760555544,Al Ladhiqiyah,Al Ladhiqiyah,539147,35.54,35.78
 city,Syria,city1760685964,Damascus,Damascus,2466000,33.5,36.3
 city,Taiwan,city1158025380,Zhongli,Zhongli,1632616,24.965,121.2168
 city,Taiwan,city1158061376,Tainan,Tainan,1876312,23,120.2
+city,Taiwan,city1158127875,Taoyuan,Taoyuan,500000,24.9889,121.3111
+city,Taiwan,city1158209038,Pingtung,Pingtung,503530,22.6817,120.4817
+city,Taiwan,city1158276420,Hsinchu,Hsinchu,750000,24.8168,120.9767
 city,Taiwan,city1158331334,Kaohsiung,Kaohsiung,2769072,22.6333,120.2666
+city,Taiwan,city1158439005,Changhua,Changhua,750000,24.0734,120.5134
 city,Taiwan,city1158689622,Taichung,Taichung,2629323,24.1521,120.6817
+city,Taiwan,city1158820647,Keelung,Keelung,500000,25.1333,121.7333
 city,Taiwan,city1158881289,Taipei,Taipei,6900273,25.0358,121.5683
 city,Tajikistan,city1762930616,Dushanbe,Dushanbe,1086244,38.56,68.7739
+city,Tanzania,city1834217168,Moshi,Moshi,721018,-3.3396,37.34
 city,Tanzania,city1834843853,Dar es Salaam,Dar es Salaam,2930000,-6.8,39.2683
 city,Thailand,city1764068610,Bangkok,Bangkok,6704000,13.75,100.5166
 city,Togo,city1768409132,Lomé,Lomé,1452000,6.1319,1.2228
 city,Tunisia,city1788742103,Tunis,Tunis,2412500,36.8028,10.1797
+city,Turkey,city1792003860,Tarsus,Tarsus,894318,36.9204,34.88
+city,Turkey,city1792169057,Samsun,Samsun,609339,41.28,36.3437
+city,Turkey,city1792536241,Diyarbakır,Diyarbakır,644763,37.9204,40.23
 city,Turkey,city1792572891,Ankara,Ankara,3716000,39.9272,32.8644
 city,Turkey,city1792725579,İzmir,İzmir,2587000,38.4361,27.1518
+city,Turkey,city1792756324,Istanbul,Istanbul,10061000,41.105,29.01
 city,Turkey,city1792783772,Adana,Adana,1293000,36.995,35.32
 city,Turkey,city1792903330,Bursa,Bursa,1492000,40.2,29.07
 city,Turkey,city1792911843,Gaziantep,Gaziantep,1044000,37.075,37.385
+city,Turkey,city1792933981,Eskişehir,Eskişehir,514869,39.795,30.53
+city,Turkey,city1792945815,Kayseri,Kayseri,592840,38.735,35.49
+city,Turkey,city1792988434,Antalya,Antalya,783000,36.89,30.7
+city,Turkmenistan,city1795049992,Ashgabat,Ashgabat,727700,37.95,58.3833
 city,Ukraine,city1804152933,Dnipro,Dnipro,1050000,48.48,35
+city,Ukraine,city1804178102,Odessa,Odessa,991000,46.49,30.71
 city,Ukraine,city1804382913,Kiev,Kiev,2709000,50.4334,30.5166
+city,Ukraine,city1804398395,Mykolayiv,Mykolayiv,510840,46.9677,31.9843
+city,Ukraine,city1804544901,Kryvyy Rih,Kryvyy Rih,652380,47.9283,33.345
 city,Ukraine,city1804588111,Kharkiv,Kharkiv,1461000,50,36.25
+city,Ukraine,city1804644752,Zaporizhzhya,Zaporizhzhya,788000,47.8573,35.1768
+city,Ukraine,city1804939658,Lvov,Lvov,803880,49.835,24.03
 city,United Arab Emirates,city1784152993,Sharjah,Sharjah,1103027,25.3714,55.4065
+city,United Arab Emirates,city1784176710,Abu Dhabi,Abu Dhabi,603492,24.4667,54.3666
 city,United Arab Emirates,city1784736618,Dubai,Dubai,1379000,25.23,55.28
+city,United Kingdom,city1826122597,Nottingham,Nottingham,825600,52.9703,-1.17
 city,United Kingdom,city1826246335,Manchester,Manchester,2230000,53.5004,-2.248
+city,United Kingdom,city1826289852,Sheffield,Sheffield,1292900,53.3667,-1.5
+city,United Kingdom,city1826292220,Newcastle,Newcastle,882000,55.0004,-1.6
 city,United Kingdom,city1826343963,Leeds,Leeds,1529000,53.83,-1.58
+city,United Kingdom,city1826362422,Cardiff,Cardiff,861400,51.5,-3.225
 city,United Kingdom,city1826423213,Birmingham,Birmingham,2285000,52.475,-1.92
+city,United Kingdom,city1826492520,Edinburgh,Edinburgh,504966,55.9483,-3.2191
+city,United Kingdom,city1826524208,Southend-on-Sea,Southend-on-Sea,618386,51.55,0.72
+city,United Kingdom,city1826558678,Liverpool,Liverpool,811000,53.416,-2.918
+city,United Kingdom,city1826609057,Brighton,Brighton,503008,50.8303,-0.17
 city,United Kingdom,city1826645935,London,London,8567000,51.5,-0.1167
+city,United Kingdom,city1826687116,Bradford,Bradford,501700,53.8,-1.75
 city,United Kingdom,city1826836462,Glasgow,Glasgow,1160000,55.8744,-4.2507
+city,United Kingdom,city1826921049,Bristol,Bristol,553528,51.45,-2.5833
 city,Uruguay,city1858107000,Montevideo,Montevideo,1513000,-34.858,-56.1711
 city,Uzbekistan,city1860331871,Tashkent,Tashkent,2184000,41.3117,69.2949
+city,Uzbekistan,city1860388706,Samarqand,Samarqand,708000,39.67,66.945
+city,Uzbekistan,city1860445095,Andijon,Andijon,650000,40.79,72.34
+city,Uzbekistan,city1860479627,Fargona,Fargona,750000,40.39,71.78
+city,Uzbekistan,city1860894033,Namangan,Namangan,750000,41,71.67
+city,Venezuela,city1862284350,Maracay,Maracay,1007000,10.2469,-67.5958
 city,Venezuela,city1862309871,Valencia,Valencia,1770000,10.23,-67.98
 city,Venezuela,city1862748204,Caracas,Caracas,2985000,10.501,-66.917
 city,Venezuela,city1862860739,Barquisimeto,Barquisimeto,1116000,10.05,-69.3
 city,Vietnam,city1704000623,Haiphong,Haiphong,1969000,20.83,106.6801
+city,Vietnam,city1704016023,Hue,Hue,950000,16.47,107.58
+city,Vietnam,city1704056461,Qui Nhon,Qui Nhon,805290,13.78,109.18
 city,Vietnam,city1704413791,Hanoi,Hanoi,4378000,21.0333,105.85
+city,Vietnam,city1704613715,Thái Nguyên,Thái Nguyên,500000,21.6,105.83
 city,Vietnam,city1704774326,Ho Chi Minh City,Ho Chi Minh City,5314000,10.78,106.695
+city,Vietnam,city1704863046,Biên Hòa,Biên Hòa,652646,10.97,106.8301
+city,Vietnam,city1704960059,Vinh,Vinh,593645,18.7,105.68
 city,Vietnam,city1704966442,Da Nang,Da Nang,1000000,16.06,108.25
 city,Zambia,city1894157390,Lusaka,Lusaka,1328000,-15.4166,28.2833
 city,Zimbabwe,city1716196799,Harare,Harare,1572000,-17.8178,31.0447
 csa,United States,csa104,"Albany-Schenectady, NY",Albany,1001501,42.821061904761905,-73.91387142857143
+csa,United States,csa106,"Albuquerque-Santa Fe-Las Vegas, NM",Albuquerque,1116713,35.27412727272727,-106.52961818181818
 csa,United States,csa122,"Atlanta--Athens-Clarke County--Sandy Springs, GA",Atlanta,7191967,33.817890909090906,-84.32387142857142
 csa,United States,csa142,"Birmingham-Hoover-Talladega, AL",Birmingham,1320658,33.461394444444444,-86.69799722222223
+csa,United States,csa147,"Boise City-Mountain Home-Ontario, ID-OR",Boise City,830590,43.70343571428572,-116.50208571428571
 csa,United States,csa148,"Boston-Worcester-Providence, MA-RI-NH-CT",Boston,9338422,42.44279411764706,-71.22163725490196
 csa,United States,csa160,"Buffalo-Cheektowaga, NY",Buffalo,1164995,42.79821333333334,-78.77778
 csa,United States,csa162,"Cape Coral-Fort Myers-Naples, FL",Cape Coral,1146332,26.440471428571428,-81.88867142857143
 csa,United States,csa172,"Charlotte-Concord, NC-SC",Charlotte,2625470,35.208727027027024,-80.88622432432433
+csa,United States,csa174,"Chattanooga-Cleveland-Dalton, TN-GA-AL",Chattanooga,688642,35.058814285714284,-85.22105
 csa,United States,csa176,"Chicago-Naperville, IL-IN-WI",Chicago,15130883,41.84442589641434,-87.94973107569722
 csa,United States,csa178,"Cincinnati-Wilmington-Maysville, OH-KY-IN",Cincinnati,2430721,39.196152,-84.450832
 csa,United States,csa184,"Cleveland-Akron-Canton, OH",Cleveland,4626609,41.327803092783505,-81.64634948453609
+csa,United States,csa192,"Columbia-Orangeburg-Newberry, SC",Columbia,708760,34.004220000000004,-81.10296
 csa,United States,csa198,"Columbus-Marion-Zanesville, OH",Columbus,2330293,40.00179189189189,-82.89822432432433
 csa,United States,csa206,"Dallas-Fort Worth, TX-OK",Dallas,11403384,32.898678504672894,-96.90879906542057
+csa,United States,csa209,"Davenport-Moline, IA-IL",Davenport,525845,41.50723846153846,-90.44826923076923
 csa,United States,csa212,"Dayton-Springfield-Sidney, OH",Dayton,1285269,39.85112962962963,-84.17637407407408
+csa,United States,csa216,"Denver-Aurora, CO",Denver,4894159,39.910064285714284,-104.96317857142857
+csa,United States,csa218,"Des Moines-Ames-West Des Moines, IA",Des Moines,887672,41.67541052631579,-93.67161578947368
 csa,United States,csa220,"Detroit-Warren-Ann Arbor, MI",Detroit,6626129,42.473007058823526,-83.2758305882353
 csa,United States,csa238,"El Paso-Las Cruces, TX-NM",El Paso,1072110,31.861425,-106.46485
 csa,United States,csa260,"Fresno-Madera, CA",Fresno,1112409,36.6635375,-119.86423125
 csa,United States,csa266,"Grand Rapids-Wyoming-Muskegon, MI",Grand Rapids,1195462,42.98267083333333,-85.7093
 csa,United States,csa268,"Greensboro--Winston-Salem--High Point, NC",Greensboro,1353358,36.099288461538464,-80.0045423076923
 csa,United States,csa273,"Greenville-Spartanburg-Anderson, SC",Greenville,1097370,34.684273684210524,-82.29986842105264
+csa,United States,csa276,"Harrisburg-York-Lebanon, PA",Harrisburg,942625,40.05708333333333,-76.87643888888888
+csa,United States,csa278,"Hartford-West Hartford, CT",Hartford,1343197,41.56455,-72.4136375
 csa,United States,csa288,"Houston-The Woodlands, TX",Houston,6984229,29.651625,-95.41596730769231
+csa,United States,csa290,"Huntsville-Decatur-Albertville, AL",Huntsville,544322,34.48337272727273,-86.4501
 csa,United States,csa294,"Indianapolis-Carmel-Muncie, IN",Indianapolis,2565057,39.772197297297296,-86.06325135135135
+csa,United States,csa298,"Jackson-Vicksburg-Brookhaven, MS",Jackson,570744,32.30146428571429,-90.2542
 csa,United States,csa300,"Jacksonville-St. Marys-Palatka, FL-GA",Jacksonville,1407998,30.222192857142858,-81.60245714285715
 csa,United States,csa312,"Kansas City-Overland Park-Kansas City, MO-KS",Kansas City,3133600,39.07154468085106,-94.60175319148937
+csa,United States,csa314,"Knoxville-Morristown-Sevierville, TN",Knoxville,867093,35.94738888888889,-83.97527777777778
+csa,United States,csa318,"Lafayette-Opelousas-Morgan City, LA",Lafayette,503749,30.115123529411765,-91.91948235294117
+csa,United States,csa336,"Lexington-Fayette--Richmond--Frankfort, KY",Lexington,563561,37.99115833333333,-84.47656666666667
+csa,United States,csa340,"Little Rock-North Little Rock, AR",Little Rock,828019,34.77942307692308,-92.2030923076923
 csa,United States,csa348,"Los Angeles-Long Beach, CA",Los Angeles,29020806,33.964922413793104,-117.8040775862069
 csa,United States,csa350,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN",Louisville/Jefferson County,1446413,38.2184,-85.690392
+csa,United States,csa357,"Madison-Janesville-Beloit, WI",Madison,833118,43.07577307692308,-89.38944615384615
 csa,United States,csa365,"McAllen-Edinburg, TX",McAllen,1299808,26.236422222222224,-98.30191111111111
 csa,United States,csa368,"Memphis-Forrest City, TN-MS-AR",Memphis,1490331,35.12232,-89.892015
 csa,United States,csa370,"Miami-Fort Lauderdale-Port St. Lucie, FL",Miami,10499862,26.270732098765432,-80.24863086419754
 csa,United States,csa376,"Milwaukee-Racine-Waukesha, WI",Milwaukee,2570823,43.03455454545455,-88.18971454545455
 csa,United States,csa378,"Minneapolis-St. Paul, MN-WI",Minneapolis,5771887,45.03904054054054,-93.3283
+csa,United States,csa380,"Mobile-Daphne-Fairhope, AL",Mobile,534256,30.631976923076923,-87.88994615384615
+csa,United States,csa382,"Modesto-Merced, CA",Modesto,866346,37.44078666666667,-120.84448
 csa,United States,csa400,"Nashville-Davidson--Murfreesboro, TN",Nashville,1821197,36.062326923076924,-86.72049230769231
 csa,United States,csa406,"New Orleans-Metairie-Hammond, LA-MS",New Orleans,1447210,30.25339230769231,-90.1308923076923
 csa,United States,csa408,"New York-Newark, NY-NJ-CT-PA",New York,36709406,40.86631146953405,-74.09673225806452
+csa,United States,csa412,"North Port-Sarasota, FL",North Port,1027394,27.254437499999998,-82.3562
 csa,United States,csa416,"Oklahoma City-Shawnee, OK",Oklahoma City,1525149,35.39941304347826,-97.51731739130435
 csa,United States,csa420,"Omaha-Council Bluffs-Fremont, NE-IA",Omaha,1005866,41.213972727272726,-96.04405454545454
 csa,United States,csa422,"Orlando-Deltona-Daytona Beach, FL",Orlando,3778365,28.792615384615384,-81.4211
+csa,United States,csa428,"Philadelphia-Reading-Camden, PA-NJ-DE-MD",Philadelphia,7415011,39.838785882352944,-75.21763647058823
 csa,United States,csa430,"Pittsburgh-New Castle-Weirton, PA-OH-WV",Pittsburgh,2559302,40.45206666666667,-79.94326315789473
 csa,United States,csa440,"Portland-Vancouver-Salem, OR-WA",Portland,3723321,45.33485319148936,-122.79438085106383
 csa,United States,csa450,"Raleigh-Durham-Chapel Hill, NC",Raleigh,2091591,35.81811785714286,-78.71100357142858
+csa,United States,csa456,"Reno-Carson City-Fernley, NV",Reno,602069,39.45845,-119.6254
+csa,United States,csa464,"Rochester-Batavia-Seneca Falls, NY",Rochester,876632,43.03754117647059,-77.54498823529411
 csa,United States,csa472,"Sacramento-Roseville, CA",Sacramento,2991352,38.79400909090909,-121.268
 csa,United States,csa476,"St. Louis-St. Charles-Farmington, MO-IL",St. Louis,3655165,38.64016,-90.30747222222222
 csa,United States,csa482,"Salt Lake City-Provo-Orem, UT",Salt Lake City,3849102,40.7463828125,-111.919984375
 csa,United States,csa488,"San Jose-San Francisco-Oakland, CA",San Jose,12440335,37.78823301886793,-122.13948301886792
 csa,United States,csa500,"Seattle-Tacoma, WA",Seattle,6484158,47.56188783783784,-122.32729864864865
+csa,United States,csa515,"South Bend-Elkhart-Mishawaka, IN-MI",South Bend,621089,41.76256363636364,-86.19787272727272
+csa,United States,csa518,"Spokane-Spokane Valley-Coeur d'Alene, WA-ID",Spokane,696342,47.76717,-117.22517
+csa,United States,csa521,"Springfield-Greenfield Town, MA",Springfield,791606,42.19386,-72.63662
+csa,United States,csa532,"Syracuse-Auburn, NY",Syracuse,530035,43.146025,-76.245725
+csa,United States,csa534,"Toledo-Port Clinton, OH",Toledo,636828,41.57002727272727,-83.59507272727272
 csa,United States,csa536,"Tucson-Nogales, AZ",Tucson,1030389,32.0841,-110.97971666666666
 csa,United States,csa538,"Tulsa-Muskogee-Bartlesville, OK",Tulsa,1103214,36.05817894736842,-95.79576842105263
 csa,United States,csa545,"Virginia Beach-Norfolk, VA-NC",Virginia Beach,2625405,36.73823076923077,-76.28671538461538
+csa,United States,csa546,"Visalia-Porterville-Hanford, CA",Visalia,591930,36.25776666666667,-119.39767499999999
 csa,United States,csa548,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA",Washington,9087666,39.10279137931035,-77.15890862068966
+csa,United States,csa566,"Youngstown-Warren, OH-PA",Youngstown,592623,41.09249411764706,-80.6128705882353

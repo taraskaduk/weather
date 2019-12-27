@@ -54,7 +54,13 @@ get_cities <- function() {
 
 
 feels_like <- function(temp, rh, wind) {
-  hi <-  if_else(is.na(rh), temp, heat.index(t = temp, rh = rh, temperature.metric = "celsius", output.metric = "celsius", round = 2))
+  hi <-  if_else(is.na(rh),
+                 temp, 
+                 heat.index(t = temp, 
+                            rh = rh, 
+                            temperature.metric = "celsius", 
+                            output.metric = "celsius", 
+                            round = 2))
   temp_f <- celsius.to.fahrenheit(temp)
   wc_f = (35.74 + 0.6215*temp_f) - 35.75*(wind^0.16) + 0.4275 * temp_f * (wind^0.16)
   wc <- if_else(is.na(wind), temp, fahrenheit.to.celsius(wc_f))
@@ -129,98 +135,4 @@ null_geometry <- function(df) {
 
 
 
-plot_data <- function(df = summary_locations, 
-                       df2 = data_daily, 
-                       pop = 1000000, 
-                       n = 25, 
-                       dir = c("most", "least"), 
-                      scope = "world",
-                       years = years, 
-                       ncol = 5) 
-{
-  
-  caption <-  ("Sources: NOAA Global Summary of the Day, U.S. Census\n taraskaduk.com | @taraskaduk")
-  colors <-  c(pleasant = "#1a9641", 
-             hot = "#d6604d", 
-             cold = "#4393c3", 
-             elements = "#bebada",
-             # wind = '#e6e6e6',
-             `hot & elements` = "#ca0020",
-             `cold & elements` = "#0571b0")
 
-  
-  for (dir in dir) {
-    for (pop in pop) {
-   
-      if(scope != "world") {
-        df <- df %>% filter(country == scope)
-      }
-  data <- df %>% 
-    filter(population > pop) %>% 
-    arrange(rank)
-  
-  if(dir == "most") { 
-    data <- head(data, n) %>% 
-      mutate(rank = row_number(desc(pleasant)),
-             label = paste0(rank, ". ", name_short, ", \n", country),
-             label = reorder(label, rank))
-  } else { 
-    data <- data %>% 
-      mutate(city = fct_rev(name_short)) %>% 
-      tail(n) %>% 
-      mutate(rank = row_number(pleasant),
-             label = paste0(rank, ". ", name_short, ", \n", country),
-             label = reorder(label, rank))
-  }
-
-  file <- paste(n, dir, pop/1000, "polar", ".png", sep = "_")
-  sub <- paste0("With population over ", comma(pop), " people.\nYears ", min(years), "-", max(years),
-                "\nRanked based on years with over 90% of daily data available.",
-                "\nVisualizing all data, including incomplete years")
-    
-  data <- data %>% 
-    rename(total_pleasant = pleasant,
-           total_hot = hot,
-           total_cold = cold,
-           total_elements = elements,
-           # total_wind = wind,
-           total_unknown = unknown) %>% 
-    inner_join(df2, by = c("location_id")) %>% 
-    mutate(year = year(date),
-           yday = yday(date))
-  
-  theme_set(theme_fivethirtyeight()+
-              theme(rect = element_blank(),
-                    panel.border = element_blank(),
-                    strip.background = element_blank(),
-                    panel.grid.major = element_blank(),
-                    axis.title=element_blank())
-            )
-  
-ggplot(data) +
-  geom_tile(aes(x=yday, y=year, col = double_class, fill = double_class)) +
-  facet_wrap(~label, ncol = ncol) +
-  scale_fill_manual(values = colors,
-                      name = "Distinct classification",
-                      aesthetics = c("colour", "fill")) +
-  labs(title = paste("Top", n, "cities with", dir, "pleasant days in a year", sep = " "),
-       caption = caption,
-       subtitle = sub) +
-  scale_x_continuous(
-    # breaks = c(1, 91, 182, 275),
-    # label = c("Jan", "Apr", "Jul", "Oct")
-    breaks = c(1, 182),
-    label = c("January", "July")
-  ) +
-  expand_limits(y = min(years)-length(years)) +
-  theme(strip.text = element_text(face = "bold", size = 10),
-        axis.text.y = element_blank()) +
-  coord_polar()
-
-ggsave(file, width = 10, height = 16, units = "in")
-
-      
-    
-  }
-}
-}

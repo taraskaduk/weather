@@ -1,17 +1,8 @@
 
 plan <- drake_plan(
-  years = seq(year(today()) - 11, year(today())-1),
+  years = seq(year(today()) - 11, year(today())),
   
-  params = list(
-    temp_max = c(20, 35), #65 - "if it didn't get up to 65F in the warmest hour..."
-    temp_min = c(5, 15), #lowest would be night + sunrise temp. Let's rule out near freezing temps.
-    #the upper limit is "when even the lowest night temp is too hot..."
-    temp_mean = c(13, 24),
-    
-    prcp = 10,
-    sndp = 10
-  ),
-  
+
   
   # Cities -----------------------------------
   cities = get_cities(),
@@ -77,19 +68,35 @@ plan <- drake_plan(
   locations = parent_location_lookup %>%
     # filter(id %in% c('1840015031', "1152554349")) %>% ##TEST PURPOSES ONLY!!!!!!!!!!!
     ###
-    filter(population >= 1000000),
+    filter(population >= 500000),
+  
+  # # Stations  ----------------------------------------------------
+  # zz_locations_stations = locations %>% 
+  #   mutate(stnid = purrr::map2(lat, lon, nearest_stations, distance = 50)) %>% 
+  #   unnest(),
+  # # Get unique stations
+  # zz_stations = locations_stations %>% 
+  #   select(stnid) %>% 
+  #   mutate(stnid = str_remove_all(stnid, "-")) %>% 
+  #   distinct(),
+  # stations_v = as_vector(stations),
   
   # Stations  ----------------------------------------------------
+  stations_df = locations %>% 
+    mutate(st = purrr::map2(lat, lon, isd_stations_search, radius = 50)) %>% 
+    select(location_id, st) %>% 
+    unnest(cols = c(st)) %>% 
+    mutate(stnid = paste(usaf, wban, sep = "-"),
+           stnid2 = paste0(usaf, wban)),
+  
   locations_stations = locations %>% 
-    mutate(stnid = purrr::map2(lat, lon, nearest_stations, distance = 25)) %>% 
-    unnest(),
+    inner_join(stations_df %>% select(location_id, stnid, stnid2, distance), by="location_id"),
+  
   # Get unique stations
-  stations = locations_stations %>% 
-    select(stnid) %>% 
-    mutate(stnid = str_remove_all(stnid, "-")) %>% 
+  stations = locations_stations %>%
+    select(stnid2) %>%
     distinct(),
   stations_v = as_vector(stations),
-  
   
   # Weather -------------------------------------
   # weather_import = get_GSOD(years = years),
@@ -111,7 +118,8 @@ plan <- drake_plan(
   
   # Join city and weather data ---------
   
-  data = locations_stations %>% 
+  data = locations_stations %>%
+    select(location_id, stnid, distance) %>% 
     inner_join(weather, by = "stnid") %>% 
     select(location_id, date = yearmoda,
            temp_max = max,
@@ -125,10 +133,15 @@ plan <- drake_plan(
            gust, 
            prcp, 
            sndp, 
-           i_fog:rh) %>% 
+           i_fog:rh,
+           distance) %>% 
+    # filter(location_id == "cbsa12420" & date == "2008-01-01") %>% 
+    # head(100) %>% 
     group_by(location_id, date) %>% 
-    summarise_all(mean, na.rm = TRUE) %>% 
+    summarise_at(vars(temp_max:rh),
+                 funs(weighted.mean(., w = 1/distance, na.rm = TRUE))) %>% 
     ungroup() %>% 
+    mutate_all( ~ case_when(!is.nan(.x) ~ .x)) %>% 
     # A few possible substitutions
     mutate(temp_max = if_else(is.na(temp_max) & !is.na(temp_min) & !is.na(temp_mean), 2*temp_mean - temp_min, temp_max),
            temp_min = if_else(is.na(temp_min) & !is.na(temp_max) & !is.na(temp_mean), 2*temp_mean - temp_max, temp_min)),
@@ -195,105 +208,104 @@ data_completed = full_data_filtered %>%
     bind_rows(data_filtered),
 
 data_collapsed = data_completed %>% 
-  select(-year, -yday) %>% 
-  group_by(location_id, date) %>% 
+  group_by(location_id, date, year, yday) %>% 
   summarise_all(max, na.rm = TRUE) %>% 
   ungroup() %>% 
-  mutate_at(vars(temp_max:es), ~if_else(is.nan(.x) | is.infinite(.x), NA_real_, .x)) %>% 
-  replace_na(list(sndp = 0, prcp = 0, i_rain_drizzle = 0, i_snow_ice = 0, wdsp = 0, gust = 0)) %>%
-  mutate_at(vars(temp_max:es), round, digits = 2) %>% 
+  mutate_at(vars(rh:es), ~if_else(is.nan(.x) | is.infinite(.x), NA_real_, .x)) %>% 
+  # replace_na(list(sndp = 0, prcp = 0, i_rain_drizzle = 0, i_snow_ice = 0, wdsp = 0, gust = 0)) %>%
+  mutate_at(vars(rh:es), round, digits = 2) %>% 
   mutate(temp_mean_feel = feels_like(temp_mean, rh, wdsp),
          temp_min_feel = feels_like(temp_min, rh, wdsp),
          temp_max_feel = feels_like(temp_max, rh, wdsp)),
 
 save_data = write_csv(data_collapsed, "data/data.csv"),
 save_locations = write_csv(locations_filtered, "data/locations.csv"),
-save_cities = write_csv(location_lookup, "data/location_lookup.csv"),
+save_cities = write_csv(location_lookup, "data/location_lookup.csv")
 
-data_daily = data_collapsed %>% 
-  mutate(hot = if_else(temp_min > params$temp_min[2] |
-                         temp_max >  params$temp_max[2] |
-                         temp_mean > params$temp_mean[2], 1, 0),
-         cold = if_else(temp_min <  params$temp_min[1] |
-                          temp_max <  params$temp_max[1]  |
-                          temp_mean < params$temp_mean[1], 1, 0),
-         # auc = map2_dbl(temp_min, temp_max, get_auc),
-         elements = if_else(prcp > params$prcp |
-                              sndp > params$sndp |
-                              i_rain_drizzle > 0.66 |
-                              i_snow_ice > 0.66, 1, 0),
-         # wind = if_else(wdsp > 10, 1, 0),
-         pleasant = if_else(hot + cold + elements  == 0, 1, 0),
-         distinct_class = case_when(pleasant == 1 ~ "pleasant",
-                                    hot == 1 ~ "hot",
-                                    cold == 1 ~ "cold", 
-                                    elements == 1 ~ "elements",
-                                    # wind == 1 ~ "wind",
-                                    TRUE  ~ NA_character_),
-         double_class =   case_when(pleasant == 1 ~ "pleasant",
-                                    hot == 1 & elements == 1 ~ "hot & elements",
-                                    cold == 1 & elements == 1 ~ "cold & elements",
-                                    hot == 1 ~ "hot",
-                                    cold == 1 ~ "cold", 
-                                    elements == 1 ~ "elements",
-                                    # wind == 1 ~ "wind",
-                                    TRUE ~ NA_character_),
-         double_class = factor(double_class, levels = c("pleasant", "elements", "cold", "cold & elements", "hot", "hot & elements"))
-  ),
-
-
-# summary_locations_auc = data_daily %>%
+# data_daily = data_collapsed %>% 
+#   mutate(hot = if_else(temp_min > params$temp_min[2] |
+#                          temp_max >  params$temp_max[2] |
+#                          temp_mean > params$temp_mean[2], 1, 0),
+#          cold = if_else(temp_min <  params$temp_min[1] |
+#                           temp_max <  params$temp_max[1]  |
+#                           temp_mean < params$temp_mean[1], 1, 0),
+#          # auc = map2_dbl(temp_min, temp_max, get_auc),
+#          elements = if_else(prcp > params$prcp |
+#                               sndp > params$sndp |
+#                               i_rain_drizzle > 0.66 |
+#                               i_snow_ice > 0.66, 1, 0),
+#          # wind = if_else(wdsp > 10, 1, 0),
+#          pleasant = if_else(hot + cold + elements  == 0, 1, 0),
+#          distinct_class = case_when(pleasant == 1 ~ "pleasant",
+#                                     hot == 1 ~ "hot",
+#                                     cold == 1 ~ "cold", 
+#                                     elements == 1 ~ "elements",
+#                                     # wind == 1 ~ "wind",
+#                                     TRUE  ~ NA_character_),
+#          double_class =   case_when(pleasant == 1 ~ "pleasant",
+#                                     hot == 1 & elements == 1 ~ "hot & elements",
+#                                     cold == 1 & elements == 1 ~ "cold & elements",
+#                                     hot == 1 ~ "hot",
+#                                     cold == 1 ~ "cold", 
+#                                     elements == 1 ~ "elements",
+#                                     # wind == 1 ~ "wind",
+#                                     TRUE ~ NA_character_),
+#          double_class = factor(double_class, levels = c("pleasant", "elements", "cold", "cold & elements", "hot", "hot & elements"))
+#   ),
+# 
+# 
+# # summary_locations_auc = data_daily %>%
+# #   filter(year < year(today())) %>% 
+# #   group_by(city, country, lat, lon, capital, population, year) %>% 
+# #   summarise(auc = mean(auc),
+# #             days = n()) %>% 
+# #   ungroup() %>% 
+# #   ## This if_else accounts for cases of leap year with all known days.
+# #   ## It makes sure we don't have negative unknown days
+# #   ## But also levels out leap year for the next step of averaging
+# #   mutate(unknown = if_else(days >= 365, 0, 365 - days)) %>% 
+# #   filter(unknown < 365 * 0.1) %>% 
+# #   #filter(country == "United States") %>% 
+# #   filter(population >= 1000000) %>% 
+# #   group_by(city, country, lat, lon, capital, population) %>% 
+# #   summarise(auc = mean(auc)) %>% 
+# #   ungroup() %>% 
+# #   mutate(rank = row_number(auc),
+# #          rank_rev = row_number(desc(auc)),
+# #          points = auc / max(auc) * 100,
+# #          name = reorder(city, rank)),
+# 
+# 
+# summary_locations = data_daily %>%
+#   mutate(year = year(date)) %>% 
 #   filter(year < year(today())) %>% 
-#   group_by(city, country, lat, lon, capital, population, year) %>% 
-#   summarise(auc = mean(auc),
-#             days = n()) %>% 
+#   group_by(location_id, year) %>% 
+#   summarise_at(vars(pleasant, hot, cold, elements), sum) %>% 
 #   ungroup() %>% 
 #   ## This if_else accounts for cases of leap year with all known days.
 #   ## It makes sure we don't have negative unknown days
 #   ## But also levels out leap year for the next step of averaging
-#   mutate(unknown = if_else(days >= 365, 0, 365 - days)) %>% 
+#   mutate(unknown = if_else(pleasant + hot + cold  >= 365, 0, 365 - pleasant - hot - cold)) %>% 
 #   filter(unknown < 365 * 0.1) %>% 
-#   #filter(country == "United States") %>% 
-#   filter(population >= 1000000) %>% 
-#   group_by(city, country, lat, lon, capital, population) %>% 
-#   summarise(auc = mean(auc)) %>% 
+#   group_by(location_id) %>% 
+#   summarise_at(vars(pleasant, hot, cold, elements, unknown), ~round(mean(.),0)) %>% 
 #   ungroup() %>% 
-#   mutate(rank = row_number(auc),
-#          rank_rev = row_number(desc(auc)),
-#          points = auc / max(auc) * 100,
-#          name = reorder(city, rank)),
-
-
-summary_locations = data_daily %>%
-  mutate(year = year(date)) %>% 
-  filter(year < year(today())) %>% 
-  group_by(location_id, year) %>% 
-  summarise_at(vars(pleasant, hot, cold, elements), sum) %>% 
-  ungroup() %>% 
-  ## This if_else accounts for cases of leap year with all known days.
-  ## It makes sure we don't have negative unknown days
-  ## But also levels out leap year for the next step of averaging
-  mutate(unknown = if_else(pleasant + hot + cold  >= 365, 0, 365 - pleasant - hot - cold)) %>% 
-  filter(unknown < 365 * 0.1) %>% 
-  group_by(location_id) %>% 
-  summarise_at(vars(pleasant, hot, cold, elements, unknown), ~round(mean(.),0)) %>% 
-  ungroup() %>% 
-  left_join(locations_filtered, by = "location_id") %>% 
-  mutate(rank = row_number(desc(pleasant)),
-         rank_rev = row_number(pleasant),
-         points = pleasant / 365 * 100,
-         name = reorder(name, rank),
-         name_short = reorder(name_short, rank),
-         ),
-
-print_plots = plot_data(df = summary_locations, 
-                         df2 = data_daily, 
-                         pop = 1000000, 
-                         n = 25, 
-                         dir = c("most", "least"), 
-                        scope = "United States",
-                         years = years,
-                         ncol = 5)
+#   left_join(locations_filtered, by = "location_id") %>% 
+#   mutate(rank = row_number(desc(pleasant)),
+#          rank_rev = row_number(pleasant),
+#          points = pleasant / 365 * 100,
+#          name = reorder(name, rank),
+#          name_short = reorder(name_short, rank),
+#          ),
+# 
+# print_plots = plot_data(df = summary_locations, 
+#                          df2 = data_daily, 
+#                          pop = 1000000, 
+#                          n = 25, 
+#                          dir = c("most", "least"), 
+#                         scope = "United States",
+#                          years = years,
+#                          ncol = 5)
 
 
 )

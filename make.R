@@ -6,4 +6,6 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 
 make(plan)
-unlink(tempdir(), force = TRUE, recursive = TRUE)
+# unlink(tempdir(), recursive = TRUE)
+
+
