@@ -1,6 +1,6 @@
 
 plan <- drake_plan(
-  years = seq(year(today()) - 11, year(today())),
+  years = seq(year(today()) - 10, year(today())-1),
   
 
   
@@ -22,13 +22,15 @@ plan <- drake_plan(
   
   cities_sf = cities %>% 
     select(id, lat, lon) %>% 
-    st_as_sf(coords = c("lon", "lat"), crs = 4269),
+    st_as_sf(coords = c("lon", "lat"), crs = 4236),
   
   
   cbsa_lookup = us_cbsas %>% 
+    st_transform(crs=4236) %>% 
     select(cbsafp, cbsa_name = name, cbsa_name_short = name_short),
   
   csa_lookup = us_csas %>% 
+    st_transform(crs=4236) %>%
     select(csafp, csa_name = name, csa_name_short = name_short),
   
   ## Find what stations match to what locations: exactly and also with a wider net.
@@ -181,46 +183,69 @@ data_filtered = data %>%
   semi_join(data_check, by = "location_id"),
 
 
-data_completed = full_data_filtered %>%
-    #GATHER
-    select(location_id, date, temp_min, temp_max, temp_mean, rh, wdsp) %>%
-    gather(metric, value, -c(location_id, date)) %>%
-    mutate(flag = if_else(is.na(value), "missing", "train"),
-           year = year(date),
-           yday = yday(date)) %>% 
-    #NEST
-    group_by(location_id, metric, flag) %>%
-    nest() %>%
-    pivot_wider(names_from = flag, values_from = data) %>%
-    filter(!is.na(missing) & !is.na(train)) %>% 
-    #MODEL
-    mutate(knn = train %>% purrr::map(f_knnreg)) %>%
-    mutate(pred_knn = map2(.x = knn, .y = missing, .f = predict)) %>% 
-    #UNNEST
-    select(-c(train, knn)) %>%
-    unnest(c(missing, pred_knn)) %>%
-    mutate(value = pred_knn,
-           flag = "predicted") %>%
-    select(location_id, date, metric, value, flag, yday, year) %>% 
-    #BIND
-    select(-flag) %>%
-    spread(metric, value) %>%
-    bind_rows(data_filtered),
+# data_completed = full_data_filtered %>%
+#     #GATHER
+#     select(location_id, date, temp_min, temp_max, temp_mean, 
+#            rh, prcp, sndp, i_rain_drizzle, i_snow_ice, wdsp) %>%
+#     gather(metric, value, -c(location_id, date)) %>%
+#     mutate(flag = if_else(is.na(value), "missing", "train"),
+#            year = year(date),
+#            yday = yday(date)) %>% 
+#     #NEST
+#     group_by(location_id, metric, flag) %>%
+#     nest() %>%
+#     pivot_wider(names_from = flag, values_from = data) %>%
+#     filter(!is.na(missing) & !is.na(train) & 
+#              !is.null(missing)  & !is.null(train) &
+#              missing != "NULL" & train != "NULL") %>% 
+#     #MODEL
+#     mutate(knn = train %>% 
+#              purrr::map(f_knnreg)) %>% 
+#     mutate(pred_knn = map2(.x = knn, .y = missing, .f = predict)) %>% 
+#     #UNNEST
+#     select(-c(train, knn)) %>%
+#     unnest(c(missing, pred_knn)) %>%
+#     ungroup() %>% 
+#     mutate(value = pred_knn,
+#            flag = "predicted") %>%
+#     select(location_id, date, metric, value, flag, yday, year) %>% 
+#     #BIND
+#     select(-flag) %>%
+#     spread(metric, value) %>%
+#     bind_rows(data_filtered),
+# 
+# data_collapsed = data_completed %>% 
+#   select(location_id, date, temp_min, temp_max, temp_mean, 
+#          rh, prcp, sndp, i_rain_drizzle, i_snow_ice, wdsp) %>% 
+#   group_by(location_id, date) %>% 
+#   summarise_all(max, na.rm = TRUE) %>% 
+#   ungroup() %>% 
+#   mutate_at(vars(temp_min:wdsp), ~if_else(is.nan(.x) | is.infinite(.x), NA_real_, .x)) %>% 
+#   # replace_na(list(sndp = 0, prcp = 0, i_rain_drizzle = 0, i_snow_ice = 0, wdsp = 0, gust = 0)) %>%
+#   mutate_at(vars(temp_min:wdsp), round, digits = 2) %>% 
+#   mutate(temp_mean_feel = feels_like(temp_mean, rh, wdsp),
+#          temp_min_feel = feels_like(temp_min, rh, wdsp),
+#          temp_max_feel = feels_like(temp_max, rh, wdsp)) %>% 
+#   mutate(year = year(date),
+#          yday = yday(date)),
 
-data_collapsed = data_completed %>% 
-  mutate(year = year(date),
-         yday = yday(date)) %>% 
-  group_by(location_id, date, year, date) %>% 
-  summarise_all(max, na.rm = TRUE) %>% 
-  ungroup() %>% 
-  mutate_at(vars(rh:es), ~if_else(is.nan(.x) | is.infinite(.x), NA_real_, .x)) %>% 
-  # replace_na(list(sndp = 0, prcp = 0, i_rain_drizzle = 0, i_snow_ice = 0, wdsp = 0, gust = 0)) %>%
-  mutate_at(vars(rh:es), round, digits = 2) %>% 
+# data_final = data_collapsed,
+
+data_final = data_filtered %>% 
+  mutate_at(vars(temp_max:rh), ~if_else(is.nan(.x) | is.infinite(.x), NA_real_, .x)) %>% 
+  replace_na(list(sndp = 0, prcp = 0, i_rain_drizzle = 0, i_snow_ice = 0, wdsp = 0, gust = 0)) %>%
+  mutate_at(vars(temp_max:rh), round, digits = 2) %>% 
   mutate(temp_mean_feel = feels_like(temp_mean, rh, wdsp),
          temp_min_feel = feels_like(temp_min, rh, wdsp),
-         temp_max_feel = feels_like(temp_max, rh, wdsp)),
+         temp_max_feel = feels_like(temp_max, rh, wdsp)) %>% 
+  filter(!is.na(temp_max) & !is.na(temp_min)) %>% 
+  bind_cols(map2_dfr(.$temp_min_feel, .$temp_max_feel, get_edd)) %>% 
+  mutate(year = year(date),
+         yday = yday(date)),
 
-save_data = write_csv(data_collapsed, "data/data.csv"),
+
+# save_data = write_csv(data_final, "data/data.csv"),
+save_data2 = saveRDS(data_final, "data/data.RDS"),
 save_locations = write_csv(locations_filtered, "data/locations.csv"),
 save_cities = write_csv(location_lookup, "data/location_lookup.csv")
 
