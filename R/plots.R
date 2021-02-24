@@ -1,3 +1,4 @@
+library(chroma)
 library(ggthemes)
 library(lubridate)
 library(scales)
@@ -11,9 +12,9 @@ theme_set(theme_tk()+
                   panel.grid.major = element_blank(),
                   axis.title=element_blank(),
                   axis.text = element_blank(),
-                  plot.title = element_text(size = rel(2),
+                  plot.title = element_text(size = rel(2.1),
                                             family="Oswald"),
-                  plot.subtitle = element_text(size = rel(1.3),
+                  plot.subtitle = element_text(size = rel(1.5),
                                                family="Oswald")))
 
 data_daily <-  readRDS("data/data.RDS")
@@ -34,13 +35,13 @@ years <- data_daily %>%
   distinct() %>% 
   as_vector()
 
-caption <-  ("Sources: NOAA Global Summary of the Day, U.S. Census\n taraskaduk.com | @taraskaduk")
+caption <-  ("Sources: NCEI Global Summary of the Day, simplemaps.com \nAuthor: @taraskaduk | taraskaduk.com")
 colors <-  c(pleasant = "#1a9641", 
              hot = "#d6604d", 
              cold = "#4393c3", 
              elements = "#bebada",
              # wind = '#e6e6e6',
-             `hot & elements` = "#ca0020",
+             `hot & elements` =  "#ca0020",
              `cold & elements` = "#0571b0")
 
 colors2 <- c(`Hot EDD`  = "#ca0020", 
@@ -58,42 +59,63 @@ plot_data <- function(df = summary_locations,
                       width = 10,
                       height = 16) 
 {
-  
+for(scope in scope)  {
   for (dir in dir) {
     for (pop in pop) {
       
       if(scope != "world") {
-        df <- df %>% 
+        data1 <- df %>% 
           filter(country == scope) %>% 
           mutate(name = paste(city, admin_name, sep=",\n"))
       } else {
-        df <- df %>% 
+        data1 <- df %>% 
           mutate(name = paste(city, country, sep=",\n"))
       }
-      data <- df %>% 
-        filter(population > pop) %>%
-        arrange(desc(pleasant))
+      
+      if(nrow(filter(data1, population > pop)) < n | 
+         pop == 0) {
+        data2 <- data1 %>% 
+          arrange(desc(population)) %>% 
+          head(n) %>%
+          arrange(desc(pleasant))
+      } else {
+        data2 <- data1 %>% 
+          filter(population > pop) %>%
+          arrange(desc(pleasant))
+      }
+    
       
       if(dir == "most") { 
-        data <- head(data, n) %>% 
+        data3 <- head(data2, n) %>% 
           mutate(rank = row_number(desc(pleasant)),
                  label = paste0(rank, ". ", name),
                  label = reorder(label, rank))
       } else { 
-        data <- data %>% 
+        data3 <- data2 %>% 
           tail(n) %>% 
           mutate(rank = row_number(pleasant),
                  label = paste0(rank, ". ", name),
                  label = reorder(label, rank))
       }
       
-      file <- paste(n, dir, scope, pop/1000, "polar", ".png", sep = "_")
-      sub <- paste0("Cities with population over ", comma(pop), " people.",
-                    "\nYears ", min(years), " (inward layer) to ", max(years), " (outward layer),",
-                    "\nvisualized Jan 1 to Dec 31 clockwise.",
-                    "\n")
+      file <- paste0("plots/", paste(n, dir, scope, pop/1000, ncol, sep = "_"))
       
-      data <- data %>% 
+      if(pop == 0) {
+      title <- paste(n, "largest", scope, "cities ranked by", 
+            "amount of pleasant days in a year", 
+            sep = " ")
+      sub <- paste0("Years ", min(years), " - ", max(years),
+                    "\n")
+      } else{
+        title <- paste(n, scope, "cities with", dir, 
+                       "amount of pleasant days in a year", 
+                       sep = " ")
+        sub <- paste0("Cities with population over ", comma(pop), " people.",
+                      "\nYears ", min(years), " - ", max(years),
+                      "\n")
+      }
+      
+      data4 <- data3 %>% 
         rename(total_pleasant = pleasant,
                total_hot = hot,
                total_cold = cold,
@@ -106,13 +128,13 @@ plot_data <- function(df = summary_locations,
         filter(yday != 366)
       
       
-      p <- ggplot(data) +
+      p1 <- ggplot(data4) +
         geom_tile(aes(x=yday, y=year, col = double_class, fill = double_class)) +
         facet_wrap(~label, ncol = ncol) +
         scale_fill_manual(values = colors,
                           name = "Distinct classification",
                           aesthetics = c("colour", "fill")) +
-        labs(title = paste("Top", n, scope, "cities with", dir, "pleasant days in a year", sep = " "),
+        labs(title = title,
              caption = caption,
              subtitle = sub) +
         # scale_x_continuous(
@@ -127,27 +149,147 @@ plot_data <- function(df = summary_locations,
               strip.text = element_text(face = "bold", size = rel(7/ncol))
               )
       
-      # # https://stackoverflow.com/questions/36779537/ggplot2-facet-wrap-y-axis-scale-on-the-first-row-only/36780639#36780639
-      # p_tab <- ggplotGrob(p)
-      # print(p_tab)
-      # 
-      # gtable_filter_remove <- function (x, name, trim = TRUE){
-      #   matches <- (str_detect(x$layout$name,"axis-t")==FALSE | x$layout$name == "axis-t-1-1")
-      #   x$layout <- x$layout[matches, , drop = FALSE]
-      #   x$grobs <- x$grobs[matches]
-      #   if (trim)
-      #     x <- gtable_trim(x)
-      #   x
-      # }
-      # 
-      # p_filtered <- gtable_filter_remove(p_tab, trim = FALSE)
-      # 
-      # grid.newpage()
-      # grid.draw(p_filtered)
-      # ggsave(file, width = 10, height=6+1.35*n/ncol, units = "in", limitsize = FALSE)
+      ggsave(paste0(file,"_pleasant.png"), 
+             p1,
+             width = width, 
+             height=height,
+             units = "in",
+             limitsize = FALSE)
+      # ggsave(paste0(file,"_pleasant.eps"), 
+      #        p1,
+      #        width = width, 
+      #        height=height,
+      #        units = "in",
+      #        limitsize = FALSE)
       
-      ggsave(file, 
-             p,
+      ggsave(paste0(file,"_pleasant.svg"), 
+             p1,
+             width = width, 
+             height=height,
+             units = "in",
+             limitsize = FALSE)
+      
+      
+
+      # EDD ---------------------------------------------------------------------
+      chot <- "#A3001B"
+      ccold <- "#04598B"
+      
+      hhot <- channel(chot, model="hsl", "h")
+      hcold <- channel(ccold, model="hsl", "h")
+      
+      shot <- channel(chot, model="hsl", "s")
+      scold <- channel(ccold, model="hsl", "s")
+      
+      lhot <- channel(chot, model="hsl", "l")
+      lcold <- channel(ccold, model="hsl", "l")
+      
+      dir2 <- if_else(dir=="most", "lowest", "highest")
+      
+      if(pop == 0) {
+        title <- paste(n, "largest",scope, "cities ranked by total Excess Degree-Days", 
+                       sep = " ")
+        sub <- paste0("Years ", min(years), " - ", max(years),
+                      "\n")
+      } else{
+        title <- paste(n, scope, "cities with", dir2, "total Excess Degree-Days", sep = " ")
+        sub <- paste0("Cities with population over ", comma(pop), " people.",
+                      "\nYears ", min(years), " - ", max(years),
+                      "\n")
+      }
+      
+      if(nrow(filter(data1, population > pop)) < n | pop == 0) {
+        data2 <- data1 %>% 
+          arrange(desc(population)) %>% 
+          head(n) %>%
+          arrange(edd_total)
+      } else {
+        data2 <- data1 %>% 
+          filter(population > pop) %>%
+          arrange(edd_total)
+      }
+      
+      
+      if(dir == "most") { 
+        data3 <- head(data2, n) %>% 
+          mutate(rank = row_number(edd_total),
+                 label = paste0(rank, ". ", name),
+                 label = reorder(label, rank))
+      } else { 
+        data3 <- data2 %>% 
+          tail(n) %>% 
+          mutate(rank = row_number(desc(edd_total)),
+                 label = paste0(rank, ". ", name),
+                 label = reorder(label, rank))
+      }
+      
+      data4 <- data3 %>% 
+        select(location_id,
+               label,
+               avg_edd_hot = edd_hot,
+               avg_edd_cold = edd_cold,
+               avg_edd_total = edd_total) %>% 
+        inner_join(df2 %>% 
+                     select(location_id,
+                            date,
+                            edd_hot,
+                            edd_cold,
+                            edd_total), by = c("location_id")) %>% 
+        mutate(year = year(date),
+               yday = yday(date)) %>% 
+        filter(yday != 366) %>% 
+        mutate(
+               edd_hot = rescale(edd_hot, to=c(0,1)),
+               edd_cold = rescale(edd_cold, to=c(0,1)),
+               l_hot = rescale(edd_hot, to=c(0.99,lhot)) %>% round(3),
+               l_cold = rescale(edd_cold, to=c(0.99,lcold)%>% round(3)),
+               s_hot = rescale(edd_hot, to=c(0.3,1)%>% round(3)),
+               s_cold = rescale(edd_cold, to=c(0.3,1)%>% round(3)),
+               hot = chroma::hsl(hhot, s_hot, l_hot),
+               cold = chroma::hsl(hcold, s_cold, l_cold),
+               color = blend(hot,cold)
+        ) %>% 
+        select(-c(l_hot,l_cold,hot,cold,s_hot,s_hot))
+      
+      # data4 %>% 
+      #   select(edd_hot, edd_cold, edd_total,color) %>% 
+      #   distinct() %>% 
+      #   arrange(edd_total,edd_hot,edd_cold) %>% 
+      #   distinct() %>% 
+      #   select(color) %>% 
+      #   distinct() %>% 
+      #   as_vector() %>% show_col()
+      
+      p2 <- ggplot(data4) +
+        geom_tile(aes(x=yday, y=year, fill=color, col=color)) +
+        facet_wrap(~label, ncol = ncol) +
+        labs(title = title,
+             caption = caption,
+             subtitle = sub) +
+        expand_limits(y = min(years)-length(years)) +
+        scale_fill_identity()+
+        scale_color_identity()+
+        coord_polar() +
+        theme(#axis.text.x = element_text(size = rel(1-ncol/50)),
+          # legend.position = "none",
+          strip.text = element_text(face = "bold", size = rel(7/ncol))
+        )
+      
+      ggsave(paste0(file,"_edd.png"), 
+             p2,
+             width = width, 
+             height=height,
+             units = "in",
+             limitsize = FALSE)
+      # ggsave(paste0(file,"_edd.eps"), 
+      #        p2,
+      #        width = width, 
+      #        height=height,
+      #        units = "in",
+      #        limitsize = FALSE)
+      
+      ggsave(paste0(file,"_edd.svg"), 
+             p2,
              width = width, 
              height=height,
              units = "in",
@@ -155,265 +297,26 @@ plot_data <- function(df = summary_locations,
     }
   }
 }
+}
 
 plot_data(df = summary_locations, 
                          df2 = data_daily, 
-                         pop = 1000000, 
-                         n = 25, 
-                         dir = "most", 
-                         scope = "United States",
+                         pop = c(1000000), 
+                         n = 50, 
+                         dir = c("most"), 
+                         scope = c("United States"),
                          years = years,
-                         ncol = 5,
+                         ncol = 10,
           width = 10,
-          height = 16)
-
+          height = 10)
 
 plot_data(df = summary_locations, 
           df2 = data_daily, 
-          pop = 1000000, 
-          n = 100, 
-          dir = c("most", "least"),
-          scope = "world",
-          years = years,
-          ncol = 10,
-          width = 10,
-          height = 17)
-
-plot_data(df = summary_locations, 
-          df2 = data_daily, 
-          pop = 1000000, 
+          pop = c(0,1000000), 
           n = 50, 
-          dir = "most",
-          scope = "world",
-          years = years,
-          ncol = 5,
-          width = 10,
-          height = 36)
-
-plot_data(df = summary_locations, 
-          df2 = data_daily, 
-          pop = 1000000, 
-          n = 100, 
-          dir = "most",
-          scope = "United States",
+          dir = c("most", "least"), 
+          scope = c("world"),
           years = years,
           ncol = 10,
           width = 10,
-          height = 17)
-
-plot_data(df = summary_locations, 
-          df2 = data_daily, 
-          pop = 1000000, 
-          n = 100, 
-          dir = "most",
-          scope = "United States",
-          years = years,
-          ncol = 5,
-          width = 10,
-          height = 50)
-
-
-
-
-
-
-
-
-
-# Testing -----------------------------------------------------------------
-df= summary_locations
-df2 = data_daily
-pop = 1000000
-n = 25
-dir = "most"
-scope = "United States"
-years = years
-ncol = 5
-width = 10
-height = 26
-
-
-
-
-if(scope != "world") {
-  df <- df %>% 
-    filter(country == scope) %>% 
-    mutate(name = paste(city, admin_name, sep=",\n"))
-} else {
-  df <- df %>% 
-    mutate(name = paste(city, country, sep=",\n"))
-}
-
-if(nrow(filter(df, population > pop)) < n) {
-  data <- df %>% 
-    arrange(desc(population)) %>% 
-    head(n) %>%
-    arrange(edd_total)
-} else {
-  data <- df %>% 
-    filter(population > pop) %>%
-    arrange(edd_total)
-}
-
-
-if(dir == "most") { 
-  data <- head(data, n) %>% 
-    mutate(rank = row_number(edd_total),
-           label = paste0(rank, ". ", name),
-           label = reorder(label, rank))
-} else { 
-  data <- data %>% 
-    tail(n) %>% 
-    mutate(rank = row_number(desc(edd_total)),
-           label = paste0(rank, ". ", name),
-           label = reorder(label, rank))
-}
-
-file <- paste(n, dir, scope, pop/1000, "polar", ".png", sep = "_")
-sub <- paste0("Cities with population over ", comma(pop), " people.",
-              "\nYears ", min(years), " (inward layer) to ", max(years), " (outward layer), ",
-              "visualized Jan 1 to Dec 31 clockwise.",
-              "\n")
-
-data2 <- data %>% 
-  select(location_id,
-         label,
-         avg_edd_hot = edd_hot,
-         avg_edd_cold = edd_cold,
-         avg_edd_total = edd_total) %>% 
-  inner_join(df2 %>% 
-               select(location_id,
-                      date,
-                      edd_hot,
-                      edd_cold,
-                      edd_total), by = c("location_id")) %>% 
-  mutate(year = year(date),
-         yday = yday(date),
-         edd_hot = rescale(edd_hot, to=c(0,1)),
-         edd_cold = rescale(edd_cold, to=c(0,1))
-         ) %>% 
-  filter(yday != 366)
-
-
-p <- ggplot(data2) +
-  geom_tile(aes(x=yday, y=year, alpha = edd_cold), 
-            #col = colors[["cold"]],
-            fill = colors[["cold & elements"]]) +
-  geom_tile(aes(x=yday, y=year, alpha = edd_hot), 
-            #col = colors[["hot"]],
-            fill = colors[["hot & elements"]]) +
-  
-  facet_wrap(~label, ncol = ncol) +
-  labs(title = paste("Top", n, scope, "cities with", dir, "pleasant days in a year", sep = " "),
-       caption = caption,
-       subtitle = sub) +
-  expand_limits(y = min(years)-length(years)) +
-  coord_polar() +
-  theme(#axis.text.x = element_text(size = rel(1-ncol/50)),
-    strip.text = element_text(face = "bold", size = rel(7/ncol)),
-    legend.position = "none"
-  )
-
-ggsave(file, 
-       p,
-       width = width, 
-       height=height,
-       units = "in",
-       limitsize = FALSE)
-
-
-
-# Testing 2 ---------------------------------------------------------------
-
-
-
-df = summary_locations
-df2 = data_daily
-pop = 1000000
-n = 10
-dir = "most"
-scope = "United States"
-years = years
-width = 10
-height = 20
-
-
-
-if(scope != "world") {
-  df <- df %>% 
-    filter(country == scope) %>% 
-    mutate(name = paste(city, admin_name, sep=",\n"))
-} else {
-  df <- df %>% 
-    mutate(name = paste(city, country, sep=",\n"))
-}
-data <- df %>% 
-  filter(population > pop) %>%
-  arrange(edd_total)
-
-if(dir == "most") { 
-  data2 <- head(data, n) %>% 
-    mutate(rank = row_number(edd_total),
-           label = paste0(rank, ". ", name),
-           label = reorder(label, rank))
-} else { 
-  data2 <- data %>% 
-    tail(n) %>% 
-    mutate(rank = row_number(desc(edd_total)),
-           label = paste0(rank, ". ", name),
-           label = reorder(label, rank))
-}
-
-file <- paste(n, dir, scope, pop/1000, "polar", ".png", sep = "_")
-sub <- paste0("Cities with population over ", comma(pop), " people.",
-              "\nYears ", min(years), " (inward layer) to ", max(years), " (outward layer), ",
-              "visualized Jan 1 to Dec 31 clockwise.",
-              "\n")
-
-data3 <- data2 %>% 
-  dplyr::select(location_id,
-         label,
-         avg_edd_hot = edd_hot,
-         avg_edd_cold = edd_cold,
-         avg_edd_total = edd_total) %>% 
-  inner_join(df2 %>% 
-               dplyr::select(location_id,
-                      date,
-                      edd_hot,
-                      edd_cold,
-                      edd_total
-                      ), by = c("location_id")) %>% 
-  mutate(year = year(date),
-         yday = yday(date),
-         edd_hot = rescale(edd_hot, to=c(0,1)),
-         edd_cold = rescale(edd_cold, to=c(0,1)),
-         edd_total = rescale(edd_total, to=c(0,1)),
-         edd_reverse = rescale(edd_total, to=c(1,0))
-  ) %>% 
-  filter(yday != 366) %>% 
-  rename(`Hot EDD` = edd_hot,
-         `Cold EDD` = edd_cold,
-         `Total EDD` = edd_total) %>% 
-  pivot_longer(cols = c(`Hot EDD`, `Cold EDD`, `Total EDD`)) %>% 
-  mutate(name = factor(name, levels = c("Hot EDD", "Cold EDD", "Total EDD")))
-
-
-p <- ggplot(data3) +
-  geom_tile(aes(x=yday, y=year, alpha = value, fill=name)) + 
-  facet_grid(label~name) +
-  labs(title = paste("Top", n, scope, "cities with", dir, "pleasant days in a year", sep = " "),
-       caption = caption,
-       subtitle = sub) +
-  expand_limits(y = min(years)-length(years)) +
-  coord_polar() +
-  scale_fill_manual(values = colors2) +
-  theme(#axis.text.x = element_text(size = rel(1-ncol/50)),
-    strip.text = element_text(face = "bold")
-  )
-
-ggsave(file, 
-       p,
-       width = width, 
-       height=height,
-       units = "in",
-       limitsize = FALSE)
+          height = 10)

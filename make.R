@@ -7,5 +7,3 @@ vis_drake_graph(config)
 
 make(plan)
 # unlink(tempdir(), recursive = TRUE)
-
-

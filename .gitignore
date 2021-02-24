@@ -12,6 +12,7 @@
 *.op.gz
 *.tar.gz
 data.csv
+*.svg
 
 # Output files from R CMD check
 /*.Rcheck/

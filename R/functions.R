@@ -29,7 +29,10 @@ get_weather <- function(yrs = seq(year(today()) - 10, year(today())-1),
   
   # Transform weather data ----------------------------------------------------
   #out <- reformat_GSOD(dsn = "data/gsod/2010")
-  out <- reformat_GSOD(file_list = paste(tempdir(), files_keep, sep = "/"))
+  out <- reformat_GSOD(file_list = paste(tempdir(), files_keep, sep = "/")) %>% 
+    rename_all(tolower) %>% 
+    rename(lat = latitude,
+           lon = longitude)
   #unlink(tempdir(), force = TRUE, recursive = TRUE)
   out
 }

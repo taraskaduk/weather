@@ -1,32 +1,68 @@
-
 plan <- drake_plan(
   years = seq(year(today()) - 10, year(today())-1),
+  start_date = ymd(paste0(min(years),"0101")),
+  end_date = ymd(paste0(max(years),"1231")),
   
   
-  
+
   # Cities -----------------------------------
   cities = get_cities(),
   
-  cities_sf = cities %>% 
-    select(id, lat, lon) %>% 
-    st_as_sf(coords = c("lon", "lat"), crs = 4236),
-  
+  # cities_sf = cities %>% 
+  #   select(id, lat, lon) %>% 
+  #   st_as_sf(coords = c("lon", "lat"), crs = 4236),
+  # 
 
   locations = cities %>%
     rename(location_id=id) %>% 
+    ## TEST TEST TEST TEST
+    # filter(location_id %in%
+    #          c("1840021990", "1484708778"
+    #            , "1604728603", "1840021117", "1804382913"
+    #            )) %>%
     filter(population >= 500000),
 
   
   # Stations  ----------------------------------------------------
-  stations_df = locations %>% 
-    mutate(st = purrr::map2(lat, lon, isd_stations_search, radius = 50)) %>% 
+  stations1 = locations %>% 
+    mutate(st = purrr::map2(lat, lon, isd_stations_search, radius = 100)) %>% 
     select(location_id, st) %>% 
     unnest(cols = c(st)) %>% 
     mutate(stnid = paste(usaf, wban, sep = "-"),
-           stnid2 = paste0(usaf, wban)),
+           stnid2 = paste0(usaf, wban),
+           begin=ymd(begin),
+           end=ymd(end),
+           useful_interval = ifelse(end > end_date, end_date, end) -
+             ifelse(begin < start_date, start_date, begin) %>% as.numeric(),
+           useful_interval = useful_interval / as.numeric(end_date - start_date)) %>% 
+    filter(useful_interval > 0.75) %>% 
+    mutate(
+      country = maps::map.where('world', lon, lat),
+      lakes = maps::map.where('lakes', lon, lat)
+    ) %>%
+    filter(!is.na(country) & is.na(lakes)) %>%
+    select(-c(lakes, country)), 
+    
+  stations_df = stations1 %>% 
+    mutate(elev_m =if_else(elev_m == -999.9, NA_real_, elev_m)) %>% 
+    group_by(location_id) %>% 
+    mutate(elev_min = if_else(distance>25, NA_real_, elev_m) %>% 
+             min(na.rm = TRUE),
+           elev_rank = abs(elev_m - elev_min) %>% 
+             min_rank(),
+           dist_rank = sqrt(distance) %>% 
+             min_rank(),
+           weight = elev_rank + dist_rank %>% 
+             scales::rescale(to=c(1,0)),
+           index = min_rank(elev_rank + dist_rank)) %>%  
+    ungroup() %>% 
+    filter(index <= 10), 
   
+          
   locations_stations = locations %>% 
-    inner_join(stations_df %>% select(location_id, stnid, stnid2, distance), by="location_id"),
+    inner_join(stations_df %>% 
+                 select(location_id, stnid, stnid2, distance, elev_m, weight, index), 
+               by="location_id"),
   
   # Get unique stations
   stations = locations_stations %>%
@@ -36,51 +72,62 @@ plan <- drake_plan(
   
   # Weather -------------------------------------
   # weather_import = get_GSOD(years = years),
-  weather_import = get_weather(yrs = years, stns = stations_v),
-  lower_colnames = colnames_tolower(weather_import),
-  weather = lower_colnames %>%
-    # New data return??? WTF, need to rename lat and lon
-    rename(lat = latitude,
-           lon = longitude) %>% 
-    filter(!is.na(lat) & !is.na(lon)) %>% 
-    # Get rid of stations on water: oceans and lakes
-    mutate(
-      country = maps::map.where('world', lon, lat),
-      lakes = maps::map.where('lakes', lon, lat),
-      yday = yday(yearmoda)
-    ) %>%
-    filter(!is.na(country) & is.na(lakes)) %>%
-    select(-c(lakes,  country)), 
+  weather = get_weather(yrs = years, stns = stations_v),
   
   # Join city and weather data ---------
   
-  data = locations_stations %>%
-    select(location_id, stnid, distance) %>% 
+  data_join = locations_stations %>%
+    select(location_id, stnid, index, weight) %>% 
     inner_join(weather, by = "stnid") %>% 
     select(location_id, date = yearmoda,
+           weight,
+           index,
            temp_max = max,
            temp_min = min, 
            temp_mean = temp, 
-           dewp, slp, 
-           stp, 
-           visib, 
+           dewp, 
+           # slp, 
+           # stp, 
+           # visib, 
            wdsp, 
-           mxspd, 
-           gust, 
+           # mxspd, 
+           # gust, 
            prcp, 
            sndp, 
-           i_fog:rh,
-           distance) %>% 
-    # filter(location_id == "cbsa12420" & date == "2008-01-01") %>% 
-    # head(100) %>% 
-    group_by(location_id, date) %>% 
-    summarise_at(vars(temp_max:rh),
-                 funs(weighted.mean(., w = 1/distance, na.rm = TRUE))) %>% 
+           # i_rain_drizzle,
+           # i_snow_ice,
+           rh),
+  
+  
+  data_sum = data_join %>% 
+    pivot_longer(cols=temp_max:rh,
+                 names_to = "var",
+                 values_to = "value") %>% 
+    filter(!(is.na(value) | ((var=="prcp" | var == "sndp") & value==0))) %>% 
+    filter(index<=5) %>% 
+    group_by(date,location_id, var) %>% 
+    summarise(value = weighted.mean(value , w = weight,
+              .groups = "drop")) %>%
     ungroup() %>% 
-    mutate_all( ~ case_when(!is.nan(.x) ~ .x)) %>% 
+    # summarise(value = mean(value) %>% round(2),
+    #           .groups = "drop") %>% 
+    pivot_wider(names_from = "var",
+                values_from = "value"),
+  
+  
+    
+  
+  data = data_sum %>% 
+    # mutate_all( ~ case_when(!is.nan(.x) ~ .x)) %>% 
+    # mutate_at(vars(temp_max, temp_min, temp_mean, dewp, wdsp, prcp, sndp, rh), 
+    #           ~if_else(is.nan(.x) | is.infinite(.x), NA_real_, .x)) %>% 
+    replace_na(list(sndp = 0, prcp = 0)) %>%
     # A few possible substitutions
-    mutate(temp_max = if_else(is.na(temp_max) & !is.na(temp_min) & !is.na(temp_mean), 2*temp_mean - temp_min, temp_max),
-           temp_min = if_else(is.na(temp_min) & !is.na(temp_max) & !is.na(temp_mean), 2*temp_mean - temp_max, temp_min)),
+    mutate(temp_max = if_else(is.na(temp_max) & !is.na(temp_min) & !is.na(temp_mean), 
+                              2*temp_mean - temp_min, temp_max),
+           temp_min = if_else(is.na(temp_min) & !is.na(temp_max) & !is.na(temp_mean), 
+                              2*temp_mean - temp_max, temp_min)) %>% 
+    filter(!(is.na(temp_max) & is.na(temp_min))),
   
   
   
@@ -106,7 +153,7 @@ plan <- drake_plan(
     group_by(location_id) %>%
     summarise(avg_ratio = mean(ratio)) %>%
     ungroup() %>%
-    filter(avg_ratio >= 0.85) %>% 
+    filter(avg_ratio >= 0.75) %>% 
     select(location_id),
   
   full_data_filtered = full_data %>% 
@@ -166,14 +213,14 @@ plan <- drake_plan(
   # data_final = data_collapsed,
   
   data_final = data_filtered %>% 
-    mutate_at(vars(temp_max:rh), ~if_else(is.nan(.x) | is.infinite(.x), NA_real_, .x)) %>% 
-    replace_na(list(sndp = 0, prcp = 0, i_rain_drizzle = 0, i_snow_ice = 0, wdsp = 0, gust = 0)) %>%
-    mutate_at(vars(temp_max:rh), round, digits = 2) %>% 
-    mutate(temp_mean_feel = feels_like(temp_mean, rh, wdsp),
-           temp_min_feel = feels_like(temp_min, rh, wdsp),
-           temp_max_feel = feels_like(temp_max, rh, wdsp)) %>% 
+    # mutate_at(vars(temp_max:rh), ~if_else(is.nan(.x) | is.infinite(.x), NA_real_, .x)) %>% 
+    # replace_na(list(sndp = 0, prcp = 0, i_rain_drizzle = 0, i_snow_ice = 0, wdsp = 0, gust = 0)) %>%
+    # mutate_at(vars(temp_max:rh), round, digits = 2) %>% 
+    # mutate(temp_mean_feel = feels_like(temp_mean, rh, wdsp),
+    #        temp_min_feel = feels_like(temp_min, rh, wdsp),
+    #        temp_max_feel = feels_like(temp_max, rh, wdsp)) %>% 
     filter(!is.na(temp_max) & !is.na(temp_min)) %>% 
-    bind_cols(map2_dfr(.$temp_min_feel, .$temp_max_feel, get_edd)) %>% 
+    bind_cols(map2_dfr(.$temp_min, .$temp_max, get_edd)) %>% 
     mutate(year = year(date),
            yday = yday(date)),
   
@@ -185,19 +232,17 @@ plan <- drake_plan(
     # Let's rule out near freezing temps.
     #the upper limit is "when even the lowest night temp is too hot..."
     # temp_mean = c(13, 24),
-    prcp = 5,
-    sndp = 20
+    prcp = 2.5,
+    sndp = 5
   ),
   
   data_daily = data_final %>%
-    mutate(hot = if_else(temp_min_feel > params$temp_hot[1] |
-                           temp_max_feel >  params$temp_hot[2], 1, 0),
-           cold = if_else(temp_min_feel < params$temp_cold[1] |
-                            temp_max_feel < params$temp_cold[2], 1, 0),
+    mutate(hot = if_else(temp_min > params$temp_hot[1] |
+                           temp_max >  params$temp_hot[2], 1, 0),
+           cold = if_else(temp_min < params$temp_cold[1] |
+                            temp_max < params$temp_cold[2], 1, 0),
            elements = if_else(prcp > params$prcp |
-                                sndp > params$sndp | 
-                                i_rain_drizzle > 0.5 |
-                                i_snow_ice > 0.5,
+                                sndp > params$sndp,
                               1, 0),
            # wind = if_else(wdsp > 10, 1, 0),
            pleasant = if_else(hot + cold + elements  == 0, 1, 0),
@@ -219,8 +264,7 @@ plan <- drake_plan(
                                  levels = c("pleasant", "elements", 
                                             "cold", "cold & elements", 
                                             "hot", "hot & elements"))
-    ) %>% 
-    select(-c(slp,stp,visib,ea,es)),
+    ),
   
   
   summary_locations = data_daily %>%
@@ -233,7 +277,8 @@ plan <- drake_plan(
     ## This if_else accounts for cases of leap year with all known days.
     ## It makes sure we don't have negative unknown days
     ## But also levels out leap year for the next step of averaging
-    mutate(unknown = if_else(pleasant + hot + cold  >= 365, 0, 365 - pleasant - hot - cold)) %>% 
+    mutate(unknown = if_else(pleasant + hot + cold + elements >= 365, 0, 
+                             365 - pleasant - hot - cold - elements)) %>% 
     filter(unknown < 365 * 0.1) %>% 
     group_by(location_id) %>% 
     summarise_at(vars(pleasant, hot, cold, elements, unknown, 
@@ -247,7 +292,8 @@ plan <- drake_plan(
     ),
   
   # save_data = write_csv(data_final, "data/data.csv"),
-  save_data = saveRDS(data_daily, "data/data.RDS"),
+  save_data = saveRDS(data_daily %>% 
+                        select(-c(dewp,hot,cold,elements,pleasant,rh,wdsp,year,yday)), "data/data.RDS"),
   save_locations = write_csv(locations_filtered, "data/locations_filtered.csv"),
   save_cities = write_csv(locations, "data/locations.csv"),
   save_summary = saveRDS(summary_locations, "data/summary_locations.RDS")
