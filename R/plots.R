@@ -1,7 +1,6 @@
-library(chroma)
-library(ggthemes)
 library(lubridate)
 library(scales)
+library(ggnewscale)
 library(tidyverse)
 
 source(Sys.getenv("theme_url"))
@@ -41,19 +40,25 @@ colors <-  c(pleasant = "#1a9641",
              cold = "#4393c3", 
              elements = "#bebada",
              # wind = '#e6e6e6',
-             `hot & elements` =  "#ca0020",
-             `cold & elements` = "#0571b0")
+             `hot & elements` =  "#B8001F",
+             `cold & elements` = "#05669E")
 
-colors2 <- c(`Hot EDD`  = "#ca0020", 
-             `Cold EDD` = "#0571b0", 
-             `Total EDD` = "#3B325D")
+col_hot <- "#B8001F"
+col_hot_low <- "#FFBEC9"
+col_cold <- "#0067A3"
+col_cold_low <- "#BAE6FF"
+
+colors2 <- c(`Hot EDD`  = col_hot, 
+             `Cold EDD` = col_cold)
 
 plot_data <- function(df = summary_locations, 
                       df2 = data_daily, 
                       pop = 1000000, 
                       n = 25, 
-                      dir = c("most", "least"), 
+                      dir = "most", 
                       scope = "world",
+                      plot = "both",
+                      output = "both",
                       years = years, 
                       ncol = 5,
                       width = 10,
@@ -72,6 +77,11 @@ for(scope in scope)  {
           mutate(name = paste(city, country, sep=",\n"))
       }
       
+      file <- paste0("plots/", paste(n, dir, scope, pop/1000, ncol, sep = "_"))
+
+      # Pleasant ----------------------------------------------------------------
+      
+    plot_pleasant <- function(){
       if(nrow(filter(data1, population > pop)) < n | 
          pop == 0) {
         data2 <- data1 %>% 
@@ -98,7 +108,6 @@ for(scope in scope)  {
                  label = reorder(label, rank))
       }
       
-      file <- paste0("plots/", paste(n, dir, scope, pop/1000, ncol, sep = "_"))
       
       if(pop == 0) {
       title <- paste(n, "largest", scope, "cities ranked by", 
@@ -155,35 +164,19 @@ for(scope in scope)  {
              height=height,
              units = "in",
              limitsize = FALSE)
-      # ggsave(paste0(file,"_pleasant.eps"), 
-      #        p1,
-      #        width = width, 
-      #        height=height,
-      #        units = "in",
-      #        limitsize = FALSE)
-      
+      if(output %in% c("svg", "both")){
       ggsave(paste0(file,"_pleasant.svg"), 
              p1,
              width = width, 
              height=height,
              units = "in",
              limitsize = FALSE)
-      
+      }
+    }
       
 
       # EDD ---------------------------------------------------------------------
-      chot <- "#A3001B"
-      ccold <- "#04598B"
-      
-      hhot <- channel(chot, model="hsl", "h")
-      hcold <- channel(ccold, model="hsl", "h")
-      
-      shot <- channel(chot, model="hsl", "s")
-      scold <- channel(ccold, model="hsl", "s")
-      
-      lhot <- channel(chot, model="hsl", "l")
-      lcold <- channel(ccold, model="hsl", "l")
-      
+    plot_edd <- function(){
       dir2 <- if_else(dir=="most", "lowest", "highest")
       
       if(pop == 0) {
@@ -237,39 +230,23 @@ for(scope in scope)  {
                             edd_total), by = c("location_id")) %>% 
         mutate(year = year(date),
                yday = yday(date)) %>% 
-        filter(yday != 366) %>% 
-        mutate(
-               edd_hot = rescale(edd_hot, to=c(0,1)),
-               edd_cold = rescale(edd_cold, to=c(0,1)),
-               l_hot = rescale(edd_hot, to=c(0.99,lhot)) %>% round(3),
-               l_cold = rescale(edd_cold, to=c(0.99,lcold)%>% round(3)),
-               s_hot = rescale(edd_hot, to=c(0.3,1)%>% round(3)),
-               s_cold = rescale(edd_cold, to=c(0.3,1)%>% round(3)),
-               hot = chroma::hsl(hhot, s_hot, l_hot),
-               cold = chroma::hsl(hcold, s_cold, l_cold),
-               color = blend(hot,cold)
-        ) %>% 
-        select(-c(l_hot,l_cold,hot,cold,s_hot,s_hot))
-      
-      # data4 %>% 
-      #   select(edd_hot, edd_cold, edd_total,color) %>% 
-      #   distinct() %>% 
-      #   arrange(edd_total,edd_hot,edd_cold) %>% 
-      #   distinct() %>% 
-      #   select(color) %>% 
-      #   distinct() %>% 
-      #   as_vector() %>% show_col()
+        filter(yday != 366)
+    
       
       p2 <- ggplot(data4) +
-        geom_tile(aes(x=yday, y=year, fill=color, col=color)) +
+        geom_tile(aes(x=yday, y=year, fill=edd_hot, alpha=edd_hot^(1/4)), col=NA) +
+        scale_fill_gradient(name = "Hot Degree-Days", low=col_hot_low, high=col_hot) +
+        new_scale_fill() +
+        geom_tile(aes(x=yday, y=year, fill=edd_cold, alpha=edd_cold^(1/4)), col=NA) +
+        scale_fill_gradient(name = "Cold Degree-Days", low=col_cold_low, high=col_cold) +
+        scale_alpha(guide = 'none') +
         facet_wrap(~label, ncol = ncol) +
         labs(title = title,
              caption = caption,
              subtitle = sub) +
         expand_limits(y = min(years)-length(years)) +
-        scale_fill_identity()+
-        scale_color_identity()+
         coord_polar() +
+        
         theme(#axis.text.x = element_text(size = rel(1-ncol/50)),
           # legend.position = "none",
           strip.text = element_text(face = "bold", size = rel(7/ncol))
@@ -288,29 +265,40 @@ for(scope in scope)  {
       #        units = "in",
       #        limitsize = FALSE)
       
+      if(output %in% c("svg", "both")){
       ggsave(paste0(file,"_edd.svg"), 
              p2,
              width = width, 
              height=height,
              units = "in",
              limitsize = FALSE)
+      }
+    }
+    
+    if (plot %in% c("pleasant", "both")){plot_pleasant()}
+    if (plot %in% c("edd", "both")){plot_edd()}
+    
     }
   }
 }
 }
 
-plot_data(df = summary_locations, 
-                         df2 = data_daily, 
-                         pop = c(1000000), 
-                         n = 50, 
-                         dir = c("most"), 
-                         scope = c("United States"),
-                         years = years,
-                         ncol = 10,
-          width = 10,
-          height = 10)
+plot_data(
+  df = summary_locations,
+  df2 = data_daily,
+  pop = 0,
+  n = 50,
+  dir = "most",
+  scope = "world",
+  plot="edd",
+  output="png",
+  years = years,
+  ncol = 10,
+  width = 10,
+  height = 10
+)
 
-plot_data(df = summary_locations, 
+dplot_data(df = summary_locations, 
           df2 = data_daily, 
           pop = c(0,1000000), 
           n = 50, 
