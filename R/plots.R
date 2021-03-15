@@ -11,10 +11,23 @@ theme_set(theme_tk()+
                   panel.grid.major = element_blank(),
                   axis.title=element_blank(),
                   axis.text = element_blank(),
-                  plot.title = element_text(size = rel(2.1),
-                                            family="Oswald"),
-                  plot.subtitle = element_text(size = rel(1.5),
-                                               family="Oswald")))
+                  legend.direction = "horizontal", 
+                  legend.box = "horizontal",
+                  legend.spacing = unit(1, 'cm'),
+                  plot.margin = unit(c(5,5,5,5), "mm"),
+                  plot.title = element_text(size = 60,
+                                            family="Oswald",
+                                            color = "black"),
+                  plot.subtitle = element_text(size = 40,
+                                               family="Oswald",
+                                               color = "black"),
+                  strip.text = element_text(face = "bold", size = 20,
+                                            color = "black"),
+                  plot.caption = element_text(size = 30,
+                                              color = "black"),
+                  legend.text = element_text(size = 15,
+                                             color = "black"),
+                  legend.title = element_text(size = 30, color = "black")))
 
 data_daily <-  readRDS("data/data.RDS")
 summary_locations <- readRDS("data/summary_locations.RDS") %>% 
@@ -34,7 +47,7 @@ years <- data_daily %>%
   distinct() %>% 
   as_vector()
 
-caption <-  ("Sources: NCEI Global Summary of the Day, simplemaps.com \nAuthor: @taraskaduk | taraskaduk.com")
+caption <-  ("\n\nSources: NCEI Global Summary of the Day, simplemaps.com\nAuthor: @taraskaduk | taraskaduk.com")
 colors <-  c(pleasant = "#1a9641", 
              hot = "#d6604d", 
              cold = "#4393c3", 
@@ -54,16 +67,17 @@ colors2 <- c(`Hot EDD`  = col_hot,
 plot_data <- function(df = summary_locations, 
                       df2 = data_daily, 
                       pop = 1000000, 
-                      n = 25, 
+                      n = 50, 
                       dir = "most", 
                       scope = "world",
                       plot = "both",
                       output = "both",
                       years = years, 
-                      ncol = 5,
-                      width = 10,
-                      height = 16) 
+                      ncol = 10,
+                      width = 25,
+                      height = 23)
 {
+  
 for(scope in scope)  {
   for (dir in dir) {
     for (pop in pop) {
@@ -110,17 +124,19 @@ for(scope in scope)  {
       
       
       if(pop == 0) {
-      title <- paste(n, "largest", scope, "cities ranked by", 
+      title <- paste(n, "largest cities ranked by", 
             "amount of pleasant days in a year", 
             sep = " ")
-      sub <- paste0("Years ", min(years), " - ", max(years),
+      sub <- paste0(ifelse(scope=="world", "", paste0("Country: ", scope, " | ")), 
+                    "Years ", min(years), " - ", max(years),
                     "\n")
       } else{
-        title <- paste(n, scope, "cities with", dir, 
+        title <- paste(n, "cities with", dir, 
                        "amount of pleasant days in a year", 
                        sep = " ")
-        sub <- paste0("Cities with population over ", comma(pop), " people.",
-                      "\nYears ", min(years), " - ", max(years),
+        sub <- paste0(ifelse(scope=="world", "", paste0("Country: ", scope, " | ")),
+                      "Population: over ", comma(pop), " people | ",
+                      "Years ", min(years), " - ", max(years),
                       "\n")
       }
       
@@ -138,11 +154,12 @@ for(scope in scope)  {
       
       
       p1 <- ggplot(data4) +
-        geom_tile(aes(x=yday, y=year, col = double_class, fill = double_class)) +
+        geom_tile(aes(x=yday, y=year, fill = double_class),
+                  col=NA, size=0.1, width=0.99, height=0.99) +
         facet_wrap(~label, ncol = ncol) +
         scale_fill_manual(values = colors,
                           name = "Distinct classification",
-                          aesthetics = c("colour", "fill")) +
+                          aesthetics = c("fill")) +
         labs(title = title,
              caption = caption,
              subtitle = sub) +
@@ -153,17 +170,16 @@ for(scope in scope)  {
         #   label = c("January", "July")
         # ) +
         expand_limits(y = min(years)-length(years)) +
-        coord_polar() +
-        theme(#axis.text.x = element_text(size = rel(1-ncol/50)),
-              strip.text = element_text(face = "bold", size = rel(7/ncol))
-              )
+        coord_polar()
       
+      if(output %in% c("png", "both")){
       ggsave(paste0(file,"_pleasant.png"), 
              p1,
-             width = width, 
-             height=height,
+             width = width,
+             height = height,
              units = "in",
              limitsize = FALSE)
+      }
       if(output %in% c("svg", "both")){
       ggsave(paste0(file,"_pleasant.svg"), 
              p1,
@@ -232,46 +248,163 @@ for(scope in scope)  {
                yday = yday(date)) %>% 
         filter(yday != 366)
     
+      # p2 <- ggplot(data4) +
+      #   geom_tile(aes(x=yday, y=year, fill=edd_hot,
+      #                 alpha=edd_hot/edd_total),
+      #             col="grey95", size=0.01) +
+      #   scale_fill_gradient2(name = "Hot Degree-Days", 
+      #                        #trans="sqrt",
+      #                        low="grey98", high=col_hot, 
+      #                       
+      #                        breaks = c(round(min(data4$edd_hot),0), 
+      #                                   round(max(data4$edd_hot),0)),
+      #                        limits = c(round(min(data4$edd_hot),0), 
+      #                                   round(max(data4$edd_hot),0))
+      #   ) +
+      #   
+      #   new_scale_fill() +
+      #   geom_tile(aes(x=yday, y=year, fill=edd_cold, 
+      #                 alpha=edd_cold/edd_total),
+      #             col="grey95", size=0.01) +
+      #   scale_fill_gradient2(name = "Cold Degree-Days",
+      #                        #trans="sqrt",
+      #                        low="grey98", high=col_cold, 
+      #                        breaks = c(round(min(data4$edd_cold),0), 
+      #                                   round(max(data4$edd_cold),0)),
+      #                        limits = c(round(min(data4$edd_cold),0), 
+      #                                   round(max(data4$edd_cold),0))
+      #   ) +
+      #   scale_alpha(guide = 'none') +
+      #   facet_wrap(~label, ncol = ncol) +
+      #   labs(title = title,
+      #        caption = caption,
+      #        subtitle = sub) +
+      #   expand_limits(y = min(years)-length(years)) +
+      #   coord_polar() 
+      # 
+      # if(output %in% c("png", "both")){
+      #   ggsave(paste0(file,"_edd.png"), 
+      #          p2,
+      #          width = width, 
+      #          height = height,
+      #          units = "in",
+      #          limitsize = FALSE)
+      # }
+      # 
+      # if(output %in% c("svg", "both")){
+      #   ggsave(paste0(file,"_edd.svg"), 
+      #          p2,
+      #          width = width, 
+      #          height=height,
+      #          units = "in",
+      #          limitsize = FALSE)
+      # }
       
-      p2 <- ggplot(data4) +
-        geom_tile(aes(x=yday, y=year, fill=edd_hot, alpha=edd_hot^(1/4)), col=NA) +
-        scale_fill_gradient(name = "Hot Degree-Days", low=col_hot_low, high=col_hot) +
+      
+      
+      p3 <- ggplot(data4) +
+        geom_tile(aes(x=yday, y=year, fill=edd_hot,
+                      alpha=edd_hot/edd_total),
+                  col="grey95", size=0.01) +
+        scale_fill_gradient2(name = "Hot Degree-Days", 
+                            #trans="sqrt",
+                            low="#1a9641", high=col_hot, mid = "#fee08b",
+                            midpoint = max(data4$edd_hot)/2,
+                            breaks = c(round(min(data4$edd_hot),0), 
+                                       round(max(data4$edd_hot),0)),
+                            limits = c(round(min(data4$edd_hot),0), 
+                                       round(max(data4$edd_hot),0))
+                            ) +
+        
         new_scale_fill() +
-        geom_tile(aes(x=yday, y=year, fill=edd_cold, alpha=edd_cold^(1/4)), col=NA) +
-        scale_fill_gradient(name = "Cold Degree-Days", low=col_cold_low, high=col_cold) +
+        geom_tile(aes(x=yday, y=year, fill=edd_cold, 
+                      alpha=edd_cold/edd_total),
+                  col="grey95", size=0.01) +
+        scale_fill_gradient2(name = "Cold Degree-Days",
+                            #trans="sqrt",
+                            low="#1a9641", high=col_cold, mid="#abd9e9",
+                            midpoint = max(data4$edd_cold)/2,
+                            breaks = c(round(min(data4$edd_cold),0), 
+                                       round(max(data4$edd_cold),0)),
+                            limits = c(round(min(data4$edd_cold),0), 
+                                       round(max(data4$edd_cold),0))
+                                       ) +
         scale_alpha(guide = 'none') +
         facet_wrap(~label, ncol = ncol) +
         labs(title = title,
              caption = caption,
              subtitle = sub) +
         expand_limits(y = min(years)-length(years)) +
-        coord_polar() +
-        
-        theme(#axis.text.x = element_text(size = rel(1-ncol/50)),
-          # legend.position = "none",
-          strip.text = element_text(face = "bold", size = rel(7/ncol))
-        )
+        coord_polar() 
       
-      ggsave(paste0(file,"_edd.png"), 
-             p2,
-             width = width, 
-             height=height,
-             units = "in",
-             limitsize = FALSE)
-      # ggsave(paste0(file,"_edd.eps"), 
-      #        p2,
-      #        width = width, 
-      #        height=height,
-      #        units = "in",
-      #        limitsize = FALSE)
+      p4 <- ggplot(data4) +
+        geom_tile(aes(x=yday, y=year, fill=edd_hot,
+                      alpha=edd_hot/edd_total),
+                  col="grey95", size=0.01) +
+        scale_fill_gradient(name = "Hot Degree-Days", 
+                             #trans="sqrt",
+                             low="grey97", high=col_hot,
+                            
+                             breaks = c(round(min(data4$edd_hot),0), 
+                                        round(max(data4$edd_hot),0)),
+                             limits = c(round(min(data4$edd_hot),0), 
+                                        round(max(data4$edd_hot),0))
+        ) +
+        
+        new_scale_fill() +
+        geom_tile(aes(x=yday, y=year, fill=edd_cold, 
+                      alpha=edd_cold/edd_total),
+                  col="grey95", size=0.01) +
+        scale_fill_gradient(name = "Cold Degree-Days",
+                             #trans="sqrt",
+                             low="grey97", high=col_cold,
+                             
+                             breaks = c(round(min(data4$edd_cold),0), 
+                                        round(max(data4$edd_cold),0)),
+                             limits = c(round(min(data4$edd_cold),0), 
+                                        round(max(data4$edd_cold),0))
+        ) +
+        scale_alpha(guide = 'none') +
+        facet_wrap(~label, ncol = ncol) +
+        labs(title = title,
+             caption = caption,
+             subtitle = sub) +
+        expand_limits(y = min(years)-length(years)) +
+        coord_polar() 
+      
+      if (output %in% c("png", "both")) {
+        ggsave(
+          paste0(file, "_edd2.png"),
+          p3,
+          width = width,
+          height = height,
+          units = "in",
+          limitsize = FALSE
+        )
+        
+        ggsave(
+          paste0(file, "_edd.png"),
+          p4,
+          width = width,
+          height = height,
+          units = "in",
+          limitsize = FALSE
+        )
+      }
       
       if(output %in% c("svg", "both")){
-      ggsave(paste0(file,"_edd.svg"), 
-             p2,
+      ggsave(paste0(file,"_edd2.svg"), 
+             p3,
              width = width, 
              height=height,
              units = "in",
              limitsize = FALSE)
+        ggsave(paste0(file,"_edd.svg"), 
+               p4,
+               width = width, 
+               height=height,
+               units = "in",
+               limitsize = FALSE)
       }
     }
     
@@ -283,28 +416,93 @@ for(scope in scope)  {
 }
 }
 
+# test
 plot_data(
   df = summary_locations,
   df2 = data_daily,
-  pop = 0,
+  pop = 1000000,
   n = 50,
-  dir = "most",
-  scope = "world",
-  plot="edd",
+  dir = "most", 
+  scope = "United States",
+  plot="pleasant",
   output="png",
-  years = years,
-  ncol = 10,
-  width = 10,
-  height = 10
+  years = years)
+
+plot_data(
+  df = summary_locations,
+  df2 = data_daily,
+  pop = c(0,1000000),
+  n = 50,
+  dir = c("most", "least"), 
+  scope = "world",
+  plot="both",
+  output="png",
+  years = years
 )
 
-dplot_data(df = summary_locations, 
+
+
+
+plot_data(
+  df = summary_locations,
+  df2 = data_daily,
+  pop = c(0,1000000),
+  n = 50,
+  dir = c("most", "least"), 
+  scope = c("world", "United States"),
+  plot="edd",
+  output="png",
+  years = years
+)
+
+plot_data(df = summary_locations, 
           df2 = data_daily, 
           pop = c(0,1000000), 
           n = 50, 
+          output = "png",
           dir = c("most", "least"), 
-          scope = c("world"),
+          scope = c("world", "United States"),
+          years = years,
+          ncol = 5,
+          width = 10,
+          height = 28)
+
+plot_data(df = summary_locations, 
+          df2 = data_daily, 
+          pop = c(0,1000000), 
+          n = 50, 
+          plot = "both",
+          output = "svg",
+          dir = c("most", "least"), 
+          scope = c("world", "United States"),
           years = years,
           ncol = 10,
           width = 10,
           height = 10)
+
+
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+
+world <- ne_countries(scale = "medium", returnclass = "sf") %>% 
+  filter(name != "Antarctica")
+
+summary_sf <- summary_locations %>% 
+  st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+ggplot() +
+  geom_sf(data = world)+
+  geom_sf(data=summary_sf, 
+          aes(col = pleasant),
+          alpha=0.5,
+          size=0.3) +
+  scale_color_gradient(low = "grey98", high = "#1a9641") +
+  coord_sf(crs = "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+
+
+
+
+ggplot(summary_locations, aes(x=pleasant, y=edd_total))+
+  geom_point(size = 1, alpha=0.5) +
+  geom_smooth(se=FALSE)

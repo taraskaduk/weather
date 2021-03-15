@@ -227,7 +227,7 @@ plan <- drake_plan(
 
   
   params =  list(
-    temp_hot = c(20, 30), 
+    temp_hot = c(20, 35), 
     temp_cold = c(0, 10), #lowest would be night + sunrise temp. 
     # Let's rule out near freezing temps.
     #the upper limit is "when even the lowest night temp is too hot..."
