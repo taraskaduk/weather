@@ -1,4 +1,5 @@
 .DS_Store
+.drake
 
 # History files
 .Rhistory
